@@ -16,13 +16,13 @@ class Server:
             print ('connected:', addr)
 
             data = conn.recv(1024)
-            msg = data.decode("utf-8")
+            msg = data.decode(config.encoding)
             if not data:
                 break
             else:
                 print(f"{addr} send message {msg}")
                 msg = client_controller.handle(msg)        
-                conn.send(msg.encode("utf-8"))
+                conn.send(msg.encode(config.encoding))
 
         conn.close()
 

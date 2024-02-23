@@ -6,10 +6,10 @@ try:
     sock.connect((config.host_ip, config.port))
 
     msg = "hello server"
-    sock.send(msg.encode("utf-8"))
+    sock.send(msg.encode(config.encoding))
 
     data = sock.recv(1024)
-    print(data.decode("utf-8"))
+    print(data.decode(config.encoding))
     sock.close()
 except:
     print("На сервере ведутся технические работы приносим свои извинение за предоставленные неудобства."
