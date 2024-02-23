@@ -3,7 +3,7 @@ import config
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 try:
-    sock.connect(('localhost', config.port))
+    sock.connect((config.host_ip, config.port))
 
     msg = "hello server"
     sock.send(msg.encode("utf-8"))
@@ -13,3 +13,4 @@ try:
 except:
     print("На сервере ведутся технические работы приносим свои извинение за предоставленные неудобства."
           "\nПопробуйте повторить попытку через пару минут")
+    sock.close()

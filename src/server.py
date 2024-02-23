@@ -1,17 +1,16 @@
-import requests
 import socket
 import config
 
-class Server():
+class Server:
     def __init__(self):
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.bind(('', config.port))
-        self.socket.listen(config.max_users)
-        print("Server начал работу")
+        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server.bind((socket.gethostbyname(socket.gethostname()), config.port))
+        self.server.listen(config.max_users)
+        print(f"Server начал работу по ip: {socket.gethostbyname(socket.gethostname())}")
 
     def mainloop(self):
         while True:
-            conn, addr = self.socket.accept()
+            conn, addr = self.server.accept()
 
             print ('connected:', addr)
 
