@@ -1,3 +1,4 @@
+from controller import client_controller
 import socket
 import config
 
@@ -20,7 +21,8 @@ class Server:
                 break
             else:
                 print(f"{addr} send message {msg}")
-            conn.send(data.upper())
+                msg = client_controller.client_controller.handle(msg)        
+                conn.send(msg.encode("utf-8"))
 
         conn.close()
 

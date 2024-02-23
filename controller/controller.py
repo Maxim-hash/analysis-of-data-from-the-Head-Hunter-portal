@@ -1,2 +1,3 @@
 class controller():
-    pass
+    def handle(self):
+        raise NotImplementedError

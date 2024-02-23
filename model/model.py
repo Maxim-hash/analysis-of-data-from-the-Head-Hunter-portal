@@ -1,2 +1,3 @@
 class model():
-    pass
+    def handle():
+        raise NotImplementedError

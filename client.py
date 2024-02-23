@@ -9,6 +9,7 @@ try:
     sock.send(msg.encode("utf-8"))
 
     data = sock.recv(1024)
+    print(data.decode("utf-8"))
     sock.close()
 except:
     print("На сервере ведутся технические работы приносим свои извинение за предоставленные неудобства."
