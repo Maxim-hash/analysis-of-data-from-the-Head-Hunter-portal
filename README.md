@@ -19,11 +19,72 @@
 Модель отвечает за требуемую обработку пришедших данных
 
 
+vacansies:
+	id 	int
+	name	text
+	publishied_at date
+	schedule text
+	prof_roles text
+	exp text
+	employment text
+	area_id int
+	empolyer_id text
+	requirement text
+	responsobility text
+
+areas:
+	id int
+	name text
+
+salary:
+	id_vacancy int
+	s_from int
+	s_to int
+	currency text
+	gross bool
+
+employer:
+	id_emp int
+	name text
+	accredited_it_empoloyer bool
+	trusted bool
+
+
+запрос пользователя может одним из следующих типов:
+	Описание прецендентов:
+		без вводных данных:
+			Требуемые данные:
+				None
+			Описание прецендента:
+				сервер отправляет статистику по всем вакансиям, всем компаниям, всем регионам
+			Выходные данные:
+				кортеж данных 
+		вакансии по городу/городам:
+			Требуемые данные:
+				наименование населённых пунктов : areas.name
+			Описание прецедента:
+				Сервер отправляет статистику по всем вакансиям определённых в запросе населённых пунктов
+			Выходные данные:
+		вакансии по команиям:
+			Требуемые данные:
+				наименование компании : employer.name
+			Описание прецедента:
+				Сервер отправляет статистику по всем вакансиям определённых в запросе компаниям
+			Выходные данные:
+		вакансии по опыту:
+			Требуемые данные:
+				диапозон опыта работы : vacansies.exp
+			Описание прецедента:
+				Сервер отправляет статистику по всем вакансиям определённых c указанным диапазоном опыта работы
+			Выходные данные:
 
 
 
 
-https://www.youtube.com/watch?v=FVFqAu47umc - ХУДШИЕ ПРАКТИКИ РАЗРАБОТКИ И АРХИТЕКТУРЫ за 12 минут
+
+
+
+
 https://www.youtube.com/watch?v=X85soC5evw0 - MVC, MVVM Архитектура. Наглядная теория и примеры
 https://www.youtube.com/watch?v=x5yGIuf13Rk&list=PLBheEHDcG7-k0eMcAdrzNFgYBf9jua3va - Паттерны проектирования на Python
 
