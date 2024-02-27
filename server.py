@@ -25,7 +25,7 @@ class Server:
                 print(f"{addr} send message {msg}")
                 msg = client_controller.handle(msg)        
                 conn.send(msg.encode(config.encoding))
-        
+        print("calceled")
         conn.close()
 
     def update_database(self):
