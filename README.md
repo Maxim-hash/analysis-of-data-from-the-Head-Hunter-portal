@@ -79,6 +79,33 @@ employer:
 			Выходные данные:
 
 
+query = {
+   CREATE : {
+       TABLE : qwe,
+       VALUE : {
+           id_vacancy : INTEGER PRIMARY KEY,
+           s_from : INTEGER,
+	        s_to : INTEGER,
+           currency : VARCHAR(50) NOT NULL,
+	        gross : BOOLEAN NOT NULL
+        }
+    }
+}
+
+query = {
+	SELECT : {
+		VALUE : {
+			id_vacancy,
+			s_from,
+	        s_to,
+            currency,
+	        gross
+		}
+		FROM : {
+			
+		}
+	}
+}
 
 
 
