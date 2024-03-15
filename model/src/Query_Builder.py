@@ -35,22 +35,18 @@ database_tables= {
 
 class Query_Builder:
     def __init__(self) -> None:
-        self.query = {}
+        self.query = []
         
-    def create(self):
-        self.query.append("CREATE ")
-        return self
-
-    def table(self, *table_name):
-        self.query.append(f"TABLE {', '.join(table_name)}")
+    def create(self, table_name):
+        self.query.append(f"CREATE {table_name}")
         return self
     
     def select(self, *args):
-        self.query.append(f"SELECT {', '.join(args)}")
+        self.query.append(f"SELECT {', '.join(args[0])}")
         return self
     
-    def _from(self):
-        self.query.append(" FROM ")
+    def _from(self, *table_name):
+        self.query.append(f" FROM {', '.join(table_name)} ")
         return self
     
     def drop(self,table_name):
@@ -61,9 +57,9 @@ class Query_Builder:
         return ''.join(self.query)
 
 
-a = Query_Builder()
+
 for i in database_tables:
-    for j in database_tables[i]:
-        a.select(j)
+    a = Query_Builder()
+    print(a.select(database_tables[i])._from(i).build())
     
 
