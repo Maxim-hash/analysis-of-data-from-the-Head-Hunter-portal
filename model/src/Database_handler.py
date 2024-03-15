@@ -12,7 +12,7 @@ class Database_handler:
 
     def __del__(self):
         self.connect.close()
-        print("Соединение с БД было закрыто деструктором")
+        #print("Соединение с БД было закрыто деструктором")
 
     def create_tables(self):
         q_builder = Query_Builder()

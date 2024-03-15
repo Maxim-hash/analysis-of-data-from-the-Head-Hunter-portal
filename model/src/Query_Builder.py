@@ -55,11 +55,3 @@ class Query_Builder:
 
     def build(self):
         return ''.join(self.query)
-
-
-
-for i in database_tables:
-    a = Query_Builder()
-    print(a.select(database_tables[i])._from(i).build())
-    
-
