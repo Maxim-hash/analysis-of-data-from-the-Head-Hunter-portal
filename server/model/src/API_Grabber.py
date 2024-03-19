@@ -1,8 +1,3 @@
-from model.src.Area import Area
-from model.src.Employer import Employer
-from model.src.Salary import Salary
-from model.src.Vacancy import Vacancy
-import json
 import requests
 
 class API_Grabber():

@@ -1,6 +1,6 @@
-from tkinter import *
 import socket
-import config
+from tkinter import *
+from structural import config
 from creational.singleton import Singleton
 
 class Window(Tk, Singleton):

@@ -1,13 +1,13 @@
+import socket
+from config import port, max_users, encoding
 from controller.client_controller import client_controller
 from controller.api_controller import api_controller
-import socket
-import config
 
 class Server:
     def __init__(self):
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server.bind((socket.gethostbyname(socket.gethostname()), config.port))
-        self.server.listen(config.max_users)
+        self.server.bind((socket.gethostbyname(socket.gethostname()), port))
+        self.server.listen(max_users)
         print(f"Server начал работу по ip: {socket.gethostbyname(socket.gethostname())}")
 
     def mainloop(self):
@@ -25,7 +25,7 @@ class Server:
             else:
                 print(f"{addr} send message {data}")
                 msg = client_controller.handle(data)        
-                conn.send(msg.encode(config.encoding))
+                conn.send(msg.encode(encoding))
         
         conn.close()
 
@@ -33,14 +33,3 @@ class Server:
         self.db = api_controller.update_database()
         print("Update database done!")
 
-def main():
-    server = Server()
-    command = input()
-    while command == 'r':
-        server.update_database()
-        command = input()
-    else:
-        server.mainloop()
-
-if __name__ == "__main__":
-    main()

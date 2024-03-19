@@ -1,5 +1,5 @@
 from model.model import *
-from model.src.Database_handler import *
+from model.src.database_handler import Database_handler
 from model.src.API_Grabber import *
 
 class API_Model(model):
@@ -13,7 +13,7 @@ class API_Model(model):
     def get_API_data():
         api_grabber = API_Grabber()
         api_grabber.set_quantity_pagination()
-        data = api_grabber.get_data()    
+        data = api_grabber.get_data()
         return data
     
             

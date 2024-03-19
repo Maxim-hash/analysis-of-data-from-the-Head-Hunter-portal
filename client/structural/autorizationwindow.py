@@ -1,13 +1,12 @@
+import socket
 from tkinter import *
 from tkinter import ttk
-import socket
-from config import *
+from structural.config import *
 from creational.singleton import Singleton
 
-
-
 class AutorizationWindow(Tk, Singleton):
-    def init(self):
+    def init(self, on_success=None):
+        self.on_success = on_success
         super().__init__() 
         self.title("Панель авторизации")
         self.geometry("400x300")
@@ -30,17 +29,19 @@ class AutorizationWindow(Tk, Singleton):
             resp = sock.recv(1024)
             self.data = resp.decode(encoding)
             if self.data == f"b'{self.entry_login.get()}, {self.entry_password.get()}' WAS HANDELED":
-                self.destroy()
                 sock.close()
+                self.on_success()
             else:
                 self.entry_login.delete(0, END)
                 self.entry_password.delete(0, END)
-            #print(self.data.decode(encoding))
         except:
+            self.entry_login.delete(0, END)
+            self.entry_password.delete(0, END)
+            sock.close()
             print("На сервере ведутся технические работы приносим свои извинение за предоставленные неудобства."
                   "\nПопробуйте повторить попытку через пару минут")
-            sock.close()
+            
 
 
-    def __init__(self):
+    def __init__(self, *args):
         pass
