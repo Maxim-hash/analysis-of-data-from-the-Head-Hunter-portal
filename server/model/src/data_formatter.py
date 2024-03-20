@@ -81,11 +81,10 @@ class Employer_Formatter(Formatter):
 
     def format(self):
         for i in self.raw_data:
-            _id = i["employer"]["id"]
             _name = i["employer"]["name"]
-            _accredited_it_employer = i["employer"]["accredited_it_employer"]
+            _accredited_it_employer = i["employer"]["accredited_it_employer"] if i["employer"]["accredited_it_employer"] else False
             _trusted = i["employer"]["trusted"]
-            self.data.append([_id, _name, _accredited_it_employer, _trusted])
+            self.data.append([_name, _accredited_it_employer, _trusted])
         return self.data
 
 class Vacansy_Formatter(Formatter):
@@ -101,10 +100,10 @@ class Vacansy_Formatter(Formatter):
             _requirement = i["snippet"]["requirement"]
             _responsobility = i["snippet"]["responsibility"]
             _schedule = i["schedule"]["id"]
-            _prof_roles = i["professional_roles"]["name"]
+            _prof_roles = i["professional_roles"][0]["name"]
             _exp = i["experience"]["id"]
             _employment = i["id"]
-            _employer_id = i["employer"]["id"]
+            _employer_name = i["employer"]["name"]
             self.data.append([
                 _id, 
                 _name, 
@@ -116,6 +115,6 @@ class Vacansy_Formatter(Formatter):
                 _prof_roles, 
                 _exp, 
                 _employment, 
-                _employer_id
+                _employer_name
             ])
         return self.data

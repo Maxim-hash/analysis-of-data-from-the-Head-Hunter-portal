@@ -13,9 +13,9 @@ class API_Model(model):
     @staticmethod
     def get_API_data():
         api_grabber = API_Grabber()
-        raw_data = api_grabber.get_data(1000)
+        raw_data = api_grabber.get_data()
         formatter = Data_Formatter(raw_data)
-        salary, vacancy, employer = formatter.format()
+        formatted_data = formatter.format()
         return raw_data
     
             

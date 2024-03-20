@@ -14,8 +14,7 @@ class AreaOrm(Base):
 class EmployerOrm(Base):
     __tablename__ = "employer"
 
-    id: Mapped[intpk]
-    name: Mapped[str_256]
+    name: Mapped[str_256] = mapped_column(primary_key=True)
     accredited_it_empoloyer: Mapped[bool] 
     trusted: Mapped[bool]
 
@@ -32,8 +31,7 @@ class VacancyOrm(Base):
     prof_roles: Mapped[str_256]
     exp: Mapped[str_256]
     empoyment: Mapped[str_256]
-    
-    employers_id: Mapped[int] = mapped_column(ForeignKey("employer.id", ondelete="CASCADE"))
+    employers_name: Mapped[int] = mapped_column(ForeignKey("employer.name", ondelete="CASCADE"))
     
 
 class SalaryOrm(Base):
