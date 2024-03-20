@@ -6,16 +6,18 @@ class Data_Formatter:
         self.raw_data = raw_data
 
     def format(self):
-        salaryModel = []
-        vacancyModel = []
-        employerModel = []
+        models = {
+            "salaryModel" : self.format_factory.format_salary,
+            "vacancyModel" : self.format_factory.format_vacancy,
+            "employerModel" : self.format_factory.format_employer
+        }
+        formatted_data = {key: [] for key in models.keys()}
         for i in self.raw_data:
             self.format_factory.set_raw_data(i["items"])
-            salaryModel.append(self.format_factory.format_salary())
-            vacancyModel.append(self.format_factory.format_employer())
-            employerModel.append(self.format_factory.format_vacancy())
+            for model_name, formatter_func in models.items():
+                formatted_data[model_name].append(formatter_func())
 
-        return salaryModel, vacancyModel, employerModel
+        return formatted_data
 
     
     
