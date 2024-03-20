@@ -16,23 +16,25 @@ class EmployerOrm(Base):
 
     id: Mapped[intpk]
     name: Mapped[str_256]
-    accredited_it_empoloyer: Mapped[bool]
+    accredited_it_empoloyer: Mapped[bool] 
     trusted: Mapped[bool]
 
-class VacansyOrm(Base):
+class VacancyOrm(Base):
     __tablename__ = "vacancy"
 
     id: Mapped[intpk]
     name: Mapped[str_256]
+    area_id: Mapped[int] = mapped_column(ForeignKey("area.id", ondelete="CASCADE"))
     publishied_at: Mapped[datetime.datetime]
+    requirement: Mapped[str_256]
+    responsobility: Mapped[str_256]
     schedule: Mapped[str_256]
     prof_roles: Mapped[str_256]
     exp: Mapped[str_256]
     empoyment: Mapped[str_256]
-    area_id: Mapped[int] = mapped_column(ForeignKey("area.id", ondelete="CASCADE"))
+    
     employers_id: Mapped[int] = mapped_column(ForeignKey("employer.id", ondelete="CASCADE"))
-    requirement: Mapped[str_256]
-    responsobility: Mapped[str_256]
+    
 
 class SalaryOrm(Base):
     __tablename__ = "salary"

@@ -1,6 +1,7 @@
 from model.model import *
 from model.src.database_handler import Database_handler
 from model.src.API_Grabber import *
+from model.src.data_formatter import Data_Formatter
 
 class API_Model(model):
     @staticmethod
@@ -12,8 +13,9 @@ class API_Model(model):
     @staticmethod
     def get_API_data():
         api_grabber = API_Grabber()
-        api_grabber.set_quantity_pagination()
-        data = api_grabber.get_data()
-        return data
+        raw_data = api_grabber.get_data(1000)
+        formatter = Data_Formatter(raw_data)
+        salary, vacancy, employer = formatter.format()
+        return raw_data
     
             
