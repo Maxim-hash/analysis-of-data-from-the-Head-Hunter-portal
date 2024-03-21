@@ -19,8 +19,6 @@ class Data_Formatter:
 
         return formatted_data
 
-    
-    
 class Formatter_Factory:
     def __init__(self):
         self.salary_foramtter = Salary_Formatter()
@@ -82,7 +80,10 @@ class Employer_Formatter(Formatter):
     def format(self):
         for i in self.raw_data:
             _name = i["employer"]["name"]
-            _accredited_it_employer = i["employer"]["accredited_it_employer"] if i["employer"]["accredited_it_employer"] else False
+            if "accredited_it_employer" in i["employer"].keys() :
+                _accredited_it_employer = i["employer"]["accredited_it_employer"]
+            else:
+                _accredited_it_employer = False
             _trusted = i["employer"]["trusted"]
             self.data.append([_name, _accredited_it_employer, _trusted])
         return self.data
