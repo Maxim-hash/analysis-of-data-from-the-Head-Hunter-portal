@@ -14,11 +14,7 @@ class API_Model(model):
     @staticmethod
     def get_API_data():
         api_grabber = API_Grabber()
-        filters = [
-        {'date_from': '2024-03-01', 'date_to': '2024-03-21'},
-        {'date_from': '2024-02-01', 'date_to': '2024-02-29'},
-        ]
-        raw_data = asyncio.run(api_grabber.get_data())
+        raw_data = api_grabber.get_data()
         formatter = Data_Formatter(raw_data)
         formatted_data = formatter.format()
         return raw_data
