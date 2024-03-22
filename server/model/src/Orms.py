@@ -15,7 +15,7 @@ class EmployerOrm(Base):
     __tablename__ = "employer"
 
     name: Mapped[str_256] = mapped_column(primary_key=True)
-    accredited_it_empoloyer: Mapped[bool] 
+    accredited_it_employer: Mapped[bool] 
     trusted: Mapped[bool]
 
 class VacancyOrm(Base):
@@ -40,5 +40,5 @@ class SalaryOrm(Base):
     id: Mapped[intpk] = mapped_column(ForeignKey("vacancy.id", ondelete="CASCADE"))
     s_from: Mapped[int | None] 
     s_to: Mapped[int | None] 
-    currency: Mapped[str_256]
-    gross: Mapped[bool]
+    currency: Mapped[str_256 | None]
+    gross: Mapped[bool | None]

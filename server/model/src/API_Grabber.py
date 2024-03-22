@@ -20,7 +20,7 @@ class API_Grabber():
         pagination = response['found'] // self.per_page + 1
         return pagination
 
-    def fetch_page(self, params):
+    def fetch_page(self, url, params):
         ext = "".join(f"&{i}={params[i]}" for i in params)
         url = f"{self.base_url}?{ext}"
         headers = {"User-Agent": "Mediapartners-Google"}
@@ -40,9 +40,8 @@ class API_Grabber():
             print(f"Timeout error: {e}")
         except requests.exceptions.RequestException as e:
             print(f"Error: {e}")
-        #response = requests.get(url, headers=headers, timeout=None)
 
-    def get_data_for_date_interval(self, date_from, date_to):
+    def prepare_request(self, date_from, date_to):
         url = f"{self.base_url}?&date_from={date_from}&date_to={date_to}"
         pagination = self.get_pagination(url)
         collected_data = []
@@ -61,17 +60,17 @@ class API_Grabber():
                 if len(response.get('items', [])) < self.per_page:
                     break  # Нет больше страниц
             
-
         return collected_data
 
-
-    def get_data(self):
-        response = [self.get_data_for_date_interval(interval["date_from"], interval["date_to"]) for interval in self.hour_interval]
+    def get_data(self, count = -1):
+        response = []
+        for interval in self.hour_interval:
+            if count != -1 and len(response) > count:
+                break
+            response.append(self.get_data_for_date_interval(interval["date_from"], interval["date_to"]))
 
         return response
         
-        
-
 class DateIntervalGenerator:
     def __init__(self):
         self.today = datetime.today()

@@ -2,7 +2,6 @@ from model.model import *
 from model.src.database_handler import Database_handler
 from model.src.API_Grabber import *
 from model.src.data_formatter import Data_Formatter
-import asyncio
 
 class API_Model(model):
     @staticmethod
@@ -14,12 +13,15 @@ class API_Model(model):
     @staticmethod
     def get_API_data():
         api_grabber = API_Grabber()
-        raw_data = api_grabber.get_data()
+        raw_data = api_grabber.get_data(5)
         formatter = Data_Formatter(raw_data)
-        temp = 0
-        for i in raw_data:
-            temp += len(i)
         formatted_data = formatter.format()
-        return raw_data
+    
+        return formatted_data
+    
+    @staticmethod
+    def load_data_into_tables(formatted_data):
+        db_handler = Database_handler()
+        db_handler.insert_into_table(formatted_data)
     
             

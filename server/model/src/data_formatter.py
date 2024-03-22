@@ -7,14 +7,14 @@ class Data_Formatter:
 
     def format(self):
         models = {
-            "salaryModel" : self.format_factory.format_salary,
+            "employerModel" : self.format_factory.format_employer,
             "vacancyModel" : self.format_factory.format_vacancy,
-            "employerModel" : self.format_factory.format_employer
+            "salaryModel" : self.format_factory.format_salary
+
         }
         formatted_data = {key: [] for key in models.keys()}
         for package in self.raw_data:
-            for block in package:
-                self.format_factory.set_raw_data(block["items"])
+                self.format_factory.set_raw_data(package)
                 for model_name, formatter_func in models.items():
                     formatted_data[model_name].append(formatter_func())
 
@@ -62,11 +62,12 @@ class Salary_Formatter(Formatter):
         super().__init__("Salary Formatter")
 
     def format(self):
+        self.data = []
         for i in self.raw_data:
-            if i["salary"] == None:
-                self.data.append(None)
-                continue
             _id = i["id"]
+            if i["salary"] == None:
+                self.data.append(SalaryOrm(id = _id, s_from =None, s_to = None, currency = None, gross = None))
+                continue
             _from = i["salary"]["from"]
             _to = i["salary"]["to"] if i["salary"]["to"] else None
             _currency= i["salary"]["currency"]
@@ -79,6 +80,7 @@ class Employer_Formatter(Formatter):
         super().__init__("Employer Formatter")
 
     def format(self):
+        self.data = []
         for i in self.raw_data:
             _name = i["employer"]["name"]
             if "accredited_it_employer" in i["employer"].keys() :
@@ -94,6 +96,7 @@ class Vacansy_Formatter(Formatter):
         super().__init__("Vacancy Formatter")
 
     def format(self):
+        self.data = []
         for i in self.raw_data:
             _id = i["id"]
             _name = i["name"]
@@ -106,7 +109,7 @@ class Vacansy_Formatter(Formatter):
             _exp = i["experience"]["id"]
             _employment = i["id"]
             _employer_name = i["employer"]["name"]
-            self.data.append(SalaryOrm(
+            self.data.append(VacancyOrm(
                 id = _id, 
                 name = _name, 
                 area_id = _area, 
