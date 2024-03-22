@@ -12,10 +12,11 @@ class Data_Formatter:
             "employerModel" : self.format_factory.format_employer
         }
         formatted_data = {key: [] for key in models.keys()}
-        for i in self.raw_data:
-            self.format_factory.set_raw_data(i["items"])
-            for model_name, formatter_func in models.items():
-                formatted_data[model_name].append(formatter_func())
+        for package in self.raw_data:
+            for block in package:
+                self.format_factory.set_raw_data(block["items"])
+                for model_name, formatter_func in models.items():
+                    formatted_data[model_name].append(formatter_func())
 
         return formatted_data
 
@@ -70,7 +71,7 @@ class Salary_Formatter(Formatter):
             _to = i["salary"]["to"] if i["salary"]["to"] else None
             _currency= i["salary"]["currency"]
             _gross = i["salary"]["gross"]
-            self.data.append([_id, _from, _to, _currency, _gross])
+            self.data.append(SalaryOrm(id=_id, s_from =_from, s_to = _to, currency = _currency, gross = _gross))
         return self.data
     
 class Employer_Formatter(Formatter):
@@ -85,7 +86,7 @@ class Employer_Formatter(Formatter):
             else:
                 _accredited_it_employer = False
             _trusted = i["employer"]["trusted"]
-            self.data.append([_name, _accredited_it_employer, _trusted])
+            self.data.append(EmployerOrm(name = _name, accredited_it_employer = _accredited_it_employer, trusted = _trusted))
         return self.data
 
 class Vacansy_Formatter(Formatter):
@@ -105,17 +106,17 @@ class Vacansy_Formatter(Formatter):
             _exp = i["experience"]["id"]
             _employment = i["id"]
             _employer_name = i["employer"]["name"]
-            self.data.append([
-                _id, 
-                _name, 
-                _area, 
-                _published_at, 
-                _requirement, 
-                _responsobility, 
-                _schedule, 
-                _prof_roles, 
-                _exp, 
-                _employment, 
-                _employer_name
-            ])
+            self.data.append(SalaryOrm(
+                id = _id, 
+                name = _name, 
+                area_id = _area, 
+                publishied_at = _published_at, 
+                requirement = _requirement, 
+                responsobility = _responsobility, 
+                schedule = _schedule, 
+                prof_roles = _prof_roles, 
+                exp = _exp, 
+                empoyment = _employment, 
+                employers_name = _employer_name
+            ))
         return self.data

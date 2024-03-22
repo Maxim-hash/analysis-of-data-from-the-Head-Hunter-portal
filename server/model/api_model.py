@@ -16,6 +16,9 @@ class API_Model(model):
         api_grabber = API_Grabber()
         raw_data = api_grabber.get_data()
         formatter = Data_Formatter(raw_data)
+        temp = 0
+        for i in raw_data:
+            temp += len(i)
         formatted_data = formatter.format()
         return raw_data
     
