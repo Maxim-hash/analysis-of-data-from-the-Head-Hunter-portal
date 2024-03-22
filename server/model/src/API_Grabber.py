@@ -41,7 +41,7 @@ class API_Grabber():
         except requests.exceptions.RequestException as e:
             print(f"Error: {e}")
 
-    def prepare_request(self, date_from, date_to):
+    def get_data_for_date_interval(self, date_from, date_to):
         url = f"{self.base_url}?&date_from={date_from}&date_to={date_to}"
         pagination = self.get_pagination(url)
         collected_data = []
@@ -59,7 +59,6 @@ class API_Grabber():
                 collected_data.extend(response.get('items', []))
                 if len(response.get('items', [])) < self.per_page:
                     break  # Нет больше страниц
-            
         return collected_data
 
     def get_data(self, count = -1):
@@ -70,7 +69,7 @@ class API_Grabber():
             response.append(self.get_data_for_date_interval(interval["date_from"], interval["date_to"]))
 
         return response
-        
+
 class DateIntervalGenerator:
     def __init__(self):
         self.today = datetime.today()
