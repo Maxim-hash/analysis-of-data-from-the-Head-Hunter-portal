@@ -1,5 +1,8 @@
 from datetime import datetime, timedelta
+import time
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3 import Retry
 
 class API_Grabber():
     def __init__(self, per_page=100):
@@ -9,20 +12,42 @@ class API_Grabber():
         self.hour_interval = generator.generate_hour_intervals()
 
     def get_pagination(self, url):
-        response = requests.get(url, timeout=5).json()
+        raw_response = requests.get(url, timeout=5)
+        while raw_response.status_code == 403:
+            time.sleep(10)
+            raw_response = requests.get(url, timeout=5)
+        response = raw_response.json()
         pagination = response['found'] // self.per_page + 1
         return pagination
 
     def fetch_page(self, params):
         ext = "".join(f"&{i}={params[i]}" for i in params)
         url = f"{self.base_url}?{ext}"
-        response = requests.get(url, timeout=5)
-        return response.json()
+        headers = {"User-Agent": "Mediapartners-Google"}
+        session = requests.Session()
+
+        retries = Retry(total=3, backoff_factor=1, status_forcelist=[429, 500, 502, 503, 504])
+        session.mount('https://', HTTPAdapter(max_retries=retries))
+        try:
+            response = session.get(url, headers=headers, timeout=5)
+            response.raise_for_status()  # Проверка на ошибки HTTP
+            return response.json()
+        except requests.exceptions.HTTPError as e:
+            print(f"HTTP error: {e}")
+        except requests.exceptions.ConnectionError as e:
+            print(f"Connection error: {e}")
+        except requests.exceptions.Timeout as e:
+            print(f"Timeout error: {e}")
+        except requests.exceptions.RequestException as e:
+            print(f"Error: {e}")
+        #response = requests.get(url, headers=headers, timeout=None)
 
     def get_data_for_date_interval(self, date_from, date_to):
         url = f"{self.base_url}?&date_from={date_from}&date_to={date_to}"
         pagination = self.get_pagination(url)
         collected_data = []
+        if pagination >= 20:
+            pagination = 19
         for page in range(0, pagination):
             params = {
                 'date_from': date_from,
@@ -31,10 +56,10 @@ class API_Grabber():
                 'page': page
             }
             response = self.fetch_page(params)
-            collected_data.extend(response.get('items', []))
-            
-            if len(response.get('items', [])) < self.per_page:
-                break  # Нет больше страниц
+            if response:
+                collected_data.extend(response.get('items', []))
+                if len(response.get('items', [])) < self.per_page:
+                    break  # Нет больше страниц
             
 
         return collected_data
