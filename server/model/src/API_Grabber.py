@@ -20,7 +20,7 @@ class API_Grabber():
         pagination = response['found'] // self.per_page + 1
         return pagination
 
-    def fetch_page(self, url, params):
+    def fetch_page(self, params):
         ext = "".join(f"&{i}={params[i]}" for i in params)
         url = f"{self.base_url}?{ext}"
         headers = {"User-Agent": "Mediapartners-Google"}
