@@ -13,8 +13,9 @@ class API_Model(model):
     @staticmethod
     def get_API_data():
         api_grabber = API_Grabber()
-        raw_data = api_grabber.get_data(5)
-        formatter = Data_Formatter(raw_data)
+        raw_vacancy_data = api_grabber.get_data("vacancy",5)
+        raw_area_data = api_grabber.get_data("area")
+        formatter = Data_Formatter(raw_vacancy_data)
         formatted_data = formatter.format()
     
         return formatted_data
