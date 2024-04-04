@@ -72,17 +72,16 @@ class API_Grabber():
                 if count != -1 and len(collected_data) > count:
                     break
                 response = self.fetch_page(url)
-                if response:
+                if type(response) == list:
+                    collected_data.extend(response)
+                elif response:
                     collected_data.extend(response.get('items', []))
-                if len(response.get('items', [])) < self.per_page:
-                    break  # Нет больше страниц
+                    if len(response.get('items', [])) < self.per_page:
+                        break  # Нет больше страниц
 
-            return response
+            return collected_data
         else:
             raise ValueError("Unsupported mode type")
-        
-
-        
 
 class URL:
     def __init__(self, url) -> None:
