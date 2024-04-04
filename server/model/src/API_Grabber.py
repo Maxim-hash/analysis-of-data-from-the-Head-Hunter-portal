@@ -73,9 +73,9 @@ class API_Grabber():
                     break
                 response = self.fetch_page(url)
                 if type(response) == list:
-                    collected_data.extend(response)
+                    collected_data.append(response)
                 elif response:
-                    collected_data.extend(response.get('items', []))
+                    collected_data.append(response.get('items', []))
                     if len(response.get('items', [])) < self.per_page:
                         break  # Нет больше страниц
 
@@ -167,7 +167,7 @@ def rec(b, buffer = []):
     if not b["areas"]:
         return (b["id"], b["parent_id"], b["name"])
     for i in b["areas"]:
-        buffer.append(rec(i))
+        buffer.append(rec(i), buffer)
     return buffer
 
 if __name__ == "__main__":

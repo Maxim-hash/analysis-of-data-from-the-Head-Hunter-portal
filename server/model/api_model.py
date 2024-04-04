@@ -16,9 +16,11 @@ class API_Model(model):
         raw_vacancy_data = api_grabber.get_data("vacancy",5)
         raw_area_data = api_grabber.get_data("area")
         formatter = Data_Formatter(raw_vacancy_data)
-        formatted_data = formatter.format()
+        formatted_vacancies_data = formatter.format("vacancy")
+        formatter.load_raw_data(raw_area_data)
+        formatted_area_data = formatter.format("area")
     
-        return formatted_data
+        return 0
     
     @staticmethod
     def load_data_into_tables(formatted_data):
