@@ -16,15 +16,6 @@ class API_Grabber():
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36'
             }
 
-    def get_pagination(self, url):
-        raw_response = requests.get(url, timeout=5)
-        while raw_response.status_code == 403:
-            time.sleep(10)
-            raw_response = requests.get(url, timeout=5)
-        response = raw_response.json()
-        pagination = response['found'] // self.per_page + 1
-        return pagination
-
     def fetch_page(self, url):
         session = requests.Session()
 

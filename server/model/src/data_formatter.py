@@ -26,6 +26,8 @@ class Data_Formatter:
     def format(self, mode):
         if mode in self.modes:
             model = self.models[self.modes[mode]]
+        else:
+            raise ValueError("Unsupported mode type")
 
         formatted_data = {key: [] for key in model.keys()}
         for package in self.raw_data:
