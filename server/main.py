@@ -7,4 +7,4 @@ if __name__ == "__main__":
         server.update_database()
         command = input()
     else:
-        server.mainloop()
+        server.mainloop() 

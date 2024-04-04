@@ -9,6 +9,7 @@ intpk = Annotated[int, mapped_column(primary_key=True)]
 class AreaOrm(Base):
     __tablename__ = "area"
     id: Mapped[intpk]
+    parent_id: Mapped[int]
     name: Mapped[str_256]
 
 class EmployerOrm(Base):

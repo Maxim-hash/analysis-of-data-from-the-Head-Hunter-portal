@@ -1,21 +1,36 @@
-from model.src.Orms import EmployerOrm, SalaryOrm, VacancyOrm
+from model.src.Orms import EmployerOrm, SalaryOrm, VacancyOrm, AreaOrm
 
 class Data_Formatter:
+    modes = {
+        "vacancy" : 0,
+        "area" : 1 
+    }
+    
     def __init__(self, raw_data):
         self.format_factory = Formatter_Factory()
         self.raw_data = raw_data
-
-    def format(self):
-        models = {
+        self.models = [
+            {
             "employerModel" : self.format_factory.format_employer,
             "vacancyModel" : self.format_factory.format_vacancy,
             "salaryModel" : self.format_factory.format_salary
+            },
+            {
+            "areaModel" : self.format_factory.format_area
+            }
+        ]
 
-        }
-        formatted_data = {key: [] for key in models.keys()}
+    def load_raw_data(self, raw_data):
+        self.raw_data = raw_data
+
+    def format(self, mode):
+        if mode in self.modes:
+            model = self.models[self.modes[mode]]
+
+        formatted_data = {key: [] for key in model.keys()}
         for package in self.raw_data:
                 self.format_factory.set_raw_data(package)
-                for model_name, formatter_func in models.items():
+                for model_name, formatter_func in model.items():
                     formatted_data[model_name].append(formatter_func())
 
         return formatted_data
@@ -25,11 +40,13 @@ class Formatter_Factory:
         self.salary_foramtter = Salary_Formatter()
         self.employer_formatter = Employer_Formatter()
         self.vacancy_formatter = Vacansy_Formatter()
+        self.area_formatter = Area_Formattter()
 
     def set_raw_data(self, raw_data):
         self.salary_foramtter.load_raw_data(raw_data)
         self.employer_formatter.load_raw_data(raw_data)
-        self.vacancy_formatter .load_raw_data(raw_data)
+        self.vacancy_formatter.load_raw_data(raw_data)
+        self.area_formatter.load_raw_data(raw_data)
 
     def format_salary(self):
         salary = self.salary_foramtter.format()
@@ -42,6 +59,10 @@ class Formatter_Factory:
     def format_vacancy(self):
         vacancy = self.vacancy_formatter.format()
         return vacancy
+    
+    def format_area(self):
+        area = self.area_formatter.format()
+        return area
     
 class Formatter:
     def __init__(self, name):
@@ -90,6 +111,39 @@ class Employer_Formatter(Formatter):
             _trusted = i["employer"]["trusted"]
             self.data.append(EmployerOrm(name = _name, accredited_it_employer = _accredited_it_employer, trusted = _trusted))
         return self.data
+    
+class Area_Formattter(Formatter):
+    def __init__(self):
+        super().__init__("Area Formatter")
+
+    def format(self):
+        self.data = []
+        for i in self.raw_data:
+            _id = i["id"]
+            _parent_id = i["parent_id"]
+            _name = i["name"]
+            parent = [AreaOrm(id = _id, parent_id = _parent_id, name = _name)]
+            child = [j for j in self.dop_format(i["areas"])]
+            parent.extend(child)
+            self.data.extend(parent)
+
+        return self.data
+
+
+    def dop_format(self, b):
+        if b == []:
+            return  
+        buffer = []
+        for i in b:
+            _id = i["id"]
+            _parent_id = i["parent_id"]
+            _name = i["name"]
+            temp = AreaOrm(id = _id, parent_id = _parent_id, name = _name)
+            buffer.append(temp)
+            if i["areas"] == []:
+                continue
+            buffer.extend(self.dop_format(i["areas"])[:-1])
+        return buffer
 
 class Vacansy_Formatter(Formatter):
     def __init__(self):
