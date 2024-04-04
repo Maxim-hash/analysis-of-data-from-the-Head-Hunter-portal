@@ -161,26 +161,3 @@ class DateIntervalGenerator:
             })
             current_start_date += timedelta(hours=1)
         return intervals
-    
-
-def rec(b, buffer = []):
-    if not b["areas"]:
-        return (b["id"], b["parent_id"], b["name"])
-    for i in b["areas"]:
-        buffer.append(rec(i), buffer)
-    return buffer
-
-if __name__ == "__main__":
-    a = URL_creator("vacancy", "https://api.hh.ru", {123145: "qwe", "qweqrq":"eqwr12441", "qqwrq":"eqwr12441"})
-    b = URL_creator("area", "https://api.hh.ru", 12312)
-    c = URL_creator("vacancy", a.build_url())
-    print(a.build_url())
-    print(b.build_url())
-    print(c.build_url())
-
-#    b = a.fetch()
-#    temp = []
-#    for i in b:
-#        temp.append((i["id"], i["parent_id"], i["name"]))
-#        temp.extend(rec(i)[-1])
-#        print(temp)
