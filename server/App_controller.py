@@ -18,7 +18,7 @@ class Server:
 
             print ('connected:', addr)
 
-            data = conn.recv(1024)
+            data = conn.recv(1024).decode(encoding)
             msg = ''
             #data.decode(config.encoding)
             if not data:
