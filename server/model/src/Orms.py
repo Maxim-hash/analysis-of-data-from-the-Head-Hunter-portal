@@ -6,6 +6,21 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 intpk = Annotated[int, mapped_column(primary_key=True)]
 
+class ModeOrm(Base):
+    __tablename__ = "mode"
+
+    id = Mapped[intpk]
+    name = Mapped[str_512]
+
+class UserOrm(Base):
+    __tablename__ = "user"
+
+    id = Mapped[intpk]
+    ip = Mapped[str_512]
+    email = Mapped[str_512]
+    password = Mapped[str_512]
+    mode_id = Mapped[int] = mapped_column(ForeignKey("mode.id", ondelete="CASCADE"))
+
 class AreaOrm(Base):
     __tablename__ = "area"
     id: Mapped[intpk]
