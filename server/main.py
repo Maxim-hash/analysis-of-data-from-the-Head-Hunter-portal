@@ -1,6 +1,6 @@
 from App_controller import Server
 
-if __name__ == "__main__":
+def main():
     server = Server()
     command = input()
     while command == 'r':
@@ -8,3 +8,6 @@ if __name__ == "__main__":
         command = input()
     else:
         server.mainloop() 
+
+if __name__ == "__main__":
+    main()  

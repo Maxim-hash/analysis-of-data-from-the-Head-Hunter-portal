@@ -2,6 +2,7 @@ import socket
 from config import port, max_users, encoding
 from controller.client_controller import client_controller
 from controller.api_controller import api_controller
+import asyncio
 
 class Server:
     def __init__(self):
@@ -30,6 +31,6 @@ class Server:
         conn.close()
 
     def update_database(self):
-        self.db = api_controller.update_database()
+        self.db = asyncio.run(api_controller.update_database())
         print("Update database done!")
 

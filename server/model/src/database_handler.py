@@ -1,5 +1,7 @@
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import create_engine, text
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import sessionmaker
 from config import settings
 from model.src.BaseOrm import Base
@@ -8,36 +10,39 @@ from model.src.Query_Builder import Query_Builder
 
 class Database_handler:
     def __init__(self) -> None:
-        self.engine = create_engine(url=settings.DATABASE_URL(), echo=True)
-        self.session_factory = sessionmaker(self.engine)
+        self.async_engine = create_async_engine(url=settings.DATABASE_URL(), echo=True)
+        self.async_session_factory = sessionmaker(self.async_engine, class_=AsyncSession)
 
-    def execute(self, string, commit = False):
-        with self.engine.connect() as conn:
-            res = conn.execute(text(string))
+    async def execute(self, string, commit=False):
+        async with self.async_engine.connect() as conn:
+            res = await conn.execute(text(string))
             if commit:
-                conn.commit()
+                await conn.commit()
         return res
 
-    def create_tables(self):
-        Base.metadata.create_all(self.engine)
+    async def create_tables(self):
+        async with self.async_engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
             
     def select_from_table(self, table):
         pass
 
-    def insert_into_table(self, formatted_data):
-        with self.session_factory() as session:
+    async def insert_into_table(self, formatted_data):
+        async with self.async_session_factory() as session:
             for model in formatted_data:
-                for entries in formatted_data[model]:
-                    for entry in entries:
-                        try:
-                            session.add(entry)  # Попытка добавить каждую запись индивидуально
-                            session.commit()
+                for i in range(0, len(formatted_data[model]), 2048):
+                        try:    
+                            async with session.begin():
+                                session.add_all(formatted_data[model][i:i+2048])
+                                await session.commit()
                         except IntegrityError as e:
                             print(f"A database integrity error occurred: {e}")
-                            session.rollback() 
+
+        return True
 
     def update_table(data):
         pass
 
-    def drop_tables(self):
-        Base.metadata.drop_all(self.engine)
+    async def drop_tables(self):
+        async with self.async_engine.begin() as conn:
+            await conn.run_sync(Base.metadata.drop_all)

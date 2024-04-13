@@ -1,3 +1,4 @@
+import datetime
 from model.src.Orms import EmployerOrm, SalaryOrm, VacancyOrm, AreaOrm
 
 class Data_Formatter:
@@ -33,8 +34,12 @@ class Data_Formatter:
         for package in self.raw_data:
                 self.format_factory.set_raw_data(package)
                 for model_name, formatter_func in model.items():
-                    formatted_data[model_name].append(formatter_func())
-
+                    items = formatter_func()
+                    formatted_data[model_name].extend(set(items))
+        #if mode == "area":
+            #formatted_data["areaModel"].append(AreaOrm(id=112, parent_id=1806, name="Ярославль"))
+        #else:
+            #formatted_data["employerModel"] = set(formatted_data["employerModel"])
         return formatted_data
 
 class Formatter_Factory:
@@ -87,12 +92,12 @@ class Salary_Formatter(Formatter):
     def format(self):
         self.data = []
         for i in self.raw_data:
-            _id = i["id"]
+            _id = int(i["id"])
             if i["salary"] == None:
                 self.data.append(SalaryOrm(id = _id, s_from =None, s_to = None, currency = None, gross = None))
                 continue
-            _from = i["salary"]["from"]
-            _to = i["salary"]["to"] if i["salary"]["to"] else None
+            _from = int(i["salary"]["from"]) if i["salary"]["from"] else None
+            _to = int(i["salary"]["to"]) if i["salary"]["to"] else None
             _currency= i["salary"]["currency"]
             _gross = i["salary"]["gross"]
             self.data.append(SalaryOrm(id=_id, s_from =_from, s_to = _to, currency = _currency, gross = _gross))
@@ -121,8 +126,8 @@ class Area_Formattter(Formatter):
     def format(self):
         self.data = []
         for i in self.raw_data:
-            _id = i["id"]
-            _parent_id = i["parent_id"]
+            _id = int(i["id"])
+            _parent_id = int(i["parent_id"]) if i["parent_id"] is not None else None
             _name = i["name"]
             parent = [AreaOrm(id = _id, parent_id = _parent_id, name = _name)]
             child = [j for j in self.dop_format(i["areas"])]
@@ -137,14 +142,14 @@ class Area_Formattter(Formatter):
             return  
         buffer = []
         for i in b:
-            _id = i["id"]
-            _parent_id = i["parent_id"]
+            _id = int(i["id"])
+            _parent_id = int(i["parent_id"]) if i["parent_id"] is not None else None
             _name = i["name"]
             temp = AreaOrm(id = _id, parent_id = _parent_id, name = _name)
             buffer.append(temp)
             if i["areas"] == []:
                 continue
-            buffer.extend(self.dop_format(i["areas"])[:-1])
+            buffer.extend(self.dop_format(i["areas"]))
         return buffer
 
 class Vacansy_Formatter(Formatter):
@@ -154,9 +159,9 @@ class Vacansy_Formatter(Formatter):
     def format(self):
         self.data = []
         for i in self.raw_data:
-            _id = i["id"]
+            _id = int(i["id"])
             _name = i["name"]
-            _area = i["area"]["id"]
+            _area = int(i["area"]["id"])
             _published_at = i["published_at"]
             _requirement = i["snippet"]["requirement"]
             _responsobility = i["snippet"]["responsibility"]

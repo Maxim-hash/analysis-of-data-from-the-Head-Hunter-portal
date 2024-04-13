@@ -9,24 +9,23 @@ class API_Model(model):
         "area" : 1
     }
 
-    def refresh_tables(self):
+    async def refresh_tables(self):
         db_handler = Database_handler()
-        db_handler.drop_tables()
-        db_handler.create_tables()
+        await db_handler.drop_tables()
+        await db_handler.create_tables()
 
     def get_API_data(self, mode):
         if mode in self.modes:
-            count = 5
-        api_grabber = API_Grabber()
-        raw_data = api_grabber.get_data(mode, count)
-        formatter = Data_Formatter(raw_data)
-        formatted_data = formatter.format(mode)
-        
-        return formatted_data
-    
+            api_grabber = API_Grabber()
+            raw_data = api_grabber.get_data(mode)
+            formatter = Data_Formatter(raw_data)
+            formatted_data = formatter.format(mode)
+            return formatted_data
+        else:
+            raise ValueError("Unsupported mode type")
 
-    def load_data_into_tables(self, formatted_data):
+    async def load_data_into_tables(self, formatted_data):
         db_handler = Database_handler()
-        db_handler.insert_into_table(formatted_data)
+        await db_handler.insert_into_table(formatted_data)
     
             
