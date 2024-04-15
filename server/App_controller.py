@@ -25,7 +25,7 @@ class Server:
                 break
             else:
                 print(f"{addr} send message {data}")
-                msg = client_controller.handle(data)        
+                msg = client_controller.handle(addr[0], data)        
                 conn.send(msg.encode(encoding))
         
         conn.close()

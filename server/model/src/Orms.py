@@ -9,17 +9,16 @@ intpk = Annotated[int, mapped_column(primary_key=True)]
 class ModeOrm(Base):
     __tablename__ = "mode"
 
-    id = Mapped[intpk]
-    name = Mapped[str_512]
+    id: Mapped[intpk]
+    name: Mapped[str_512]
 
 class UserOrm(Base):
     __tablename__ = "user"
 
-    id = Mapped[intpk]
-    ip = Mapped[str_512]
-    email = Mapped[str_512]
-    password = Mapped[str_512]
-    mode_id = Mapped[int] = mapped_column(ForeignKey("mode.id", ondelete="CASCADE"))
+    ip:  Mapped[str_512] 
+    email: Mapped[str_512] = mapped_column(primary_key=True)
+    password: Mapped[str_512]
+    mode_id: Mapped[int] = mapped_column(ForeignKey("mode.id", ondelete="CASCADE"))
 
 class AreaOrm(Base):
     __tablename__ = "area"
@@ -33,8 +32,6 @@ class AreaOrm(Base):
         return (self.id == other.id and 
                 self.parent_id == other.parent_id and 
                 self.name == other.name)
-
-    
 
     def __hash__(self):
         # Для примера можно использовать хэширование по id

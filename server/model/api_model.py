@@ -26,6 +26,8 @@ class API_Model(model):
 
     async def load_data_into_tables(self, formatted_data):
         db_handler = Database_handler()
-        await db_handler.insert_into_table(formatted_data)
+        for model in formatted_data:
+            for i in range(0, len(formatted_data[model]), 2048):
+                await db_handler.insert_into_table(formatted_data[model][i:i+2048])
     
             

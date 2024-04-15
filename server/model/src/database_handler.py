@@ -23,20 +23,30 @@ class Database_handler:
     async def create_tables(self):
         async with self.async_engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
+
+    async def get(self, orm, primary_key):
+        async with self.async_session_factory() as session:
+            data = await session.get(orm, primary_key)
+        return data
+    
+    async def add(self, data):
+        async with self.async_session_factory() as session:
+            async with session.begin():
+                session.add(data)
+        return True
             
-    def select_from_table(self, table):
-        pass
+    async def select_from_table(self, data):
+        async with self.async_session_factory() as session:
+            pass
 
     async def insert_into_table(self, formatted_data):
         async with self.async_session_factory() as session:
-            for model in formatted_data:
-                for i in range(0, len(formatted_data[model]), 2048):
-                        try:    
-                            async with session.begin():
-                                session.add_all(formatted_data[model][i:i+2048])
-                                await session.commit()
-                        except IntegrityError as e:
-                            print(f"A database integrity error occurred: {e}")
+            try:    
+                async with session.begin():
+                    session.add_all(formatted_data)
+
+            except IntegrityError as e:
+                print(f"A database integrity error occurred: {e}")
 
         return True
 

@@ -9,7 +9,7 @@ class Window(Tk, Singleton):
         self.title("HeadHunder client")
         self.geometry("1280x720")
 
-        Label(self, text="Login").pack(pady=20)
+        Label(self, text="Search").pack(pady=20)
         self.entry_login = Entry(width=40)
         self.entry_login.pack()
         self.l = Label(self)
