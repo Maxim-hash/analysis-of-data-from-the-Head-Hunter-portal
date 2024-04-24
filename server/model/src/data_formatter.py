@@ -36,10 +36,6 @@ class Data_Formatter:
                 for model_name, formatter_func in model.items():
                     items = formatter_func()
                     formatted_data[model_name].extend(set(items))
-        #if mode == "area":
-            #formatted_data["areaModel"].append(AreaOrm(id=112, parent_id=1806, name="Ярославль"))
-        #else:
-            #formatted_data["employerModel"] = set(formatted_data["employerModel"])
         return formatted_data
 
 class Formatter_Factory:
