@@ -11,38 +11,40 @@ class client_model():
             "Denied" : "10" 
             }
         
-    def parse_credentials(func):
+    def parse_input(func):
         @functools.wraps(func)
-        async def wrapper(cls, data, *args, **kwargs):
-            cleaned_string = data.replace("b'", "").replace("'", "")
+        def wrapper(self, *args):
+            input_string = args[0]
+            cleaned_string = input_string.replace("b'", "").replace("'", "")
             decoded = base64.b64decode(cleaned_string).decode()
-            login, password = decoded.split(":")
-            return await func(cls, login, password, *args, **kwargs)
+            split_input = decoded.split(":")
+
+            return func(self, split_input, *args[1:])
         return wrapper
         
     def handle(self, data):
         return(f"{data} WAS HANDELED")
     
-    @parse_credentials
-    async def auth(self, login, password, ip):
+    @parse_input
+    async def auth(self, decoded_data, ip):
         db_handler = Database_handler()
-        user = await db_handler.get(UserOrm, login)
+        user = await db_handler.get(UserOrm, decoded_data[0])
         if user == None:
-            userObj = UserOrm(email=login, ip=ip, password=password, mode_id=0)
+            userObj = UserOrm(email=decoded_data[0], ip=ip, password=decoded_data[1], mode_id=0)
             await db_handler.add(userObj)
             return self.return_code["Access"] + "0"
         
         return self.return_code["Denied"] + "1"
 
-    @parse_credentials
-    async def login(self, login, password):
+    @parse_input
+    async def login(self, decoded_data):
         db_handler = Database_handler()
-        user = await db_handler.get(UserOrm, login)
+        user = await db_handler.get(UserOrm, decoded_data[0])
         if user == None:
-            self.return_code["Denied"] + "2"
-            
+            return self.return_code["Denied"] + "2"
+
         return self.return_code["Access"] + "0"
 
-
-    def get(self, data):
-        pass
+    @parse_input
+    async def get(self, vacancy_name):
+        return "Success"
