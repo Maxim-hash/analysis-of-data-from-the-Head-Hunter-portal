@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from config import settings
 from model.src.BaseOrm import Base
 from model.src.Orms import *
-from model.src.Query_Builder import Query_Builder
+from model.src.Query_Builder import *
 
 class Database_handler:
     def __init__(self) -> None:
@@ -35,9 +35,17 @@ class Database_handler:
                 session.add(data)
         return True
             
-    async def select_from_table(self, data):
+    async def select(self, data):
         async with self.async_session_factory() as session:
-            pass
+            query_builder = QueryBuilder()
+            query_builder.add_filter(ProfessionFilter(data[0]))
+            query_builder.add_filter(RegionFilter(data[1]))
+            query_builder.add_filter(ExperienceFilter(data[2]))
+            query = query_builder.build()
+            result = query.all()
+
+            return result 
+
 
     async def insert_into_table(self, formatted_data):
         async with self.async_session_factory() as session:
