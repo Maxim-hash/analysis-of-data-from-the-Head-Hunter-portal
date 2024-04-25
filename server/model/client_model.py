@@ -46,5 +46,7 @@ class client_model():
         return self.return_code["Access"] + "0"
 
     @parse_input
-    async def get(self, vacancy_name):
+    async def get(self, decoded_data):
+        db_handler = Database_handler()
+        
         return "Success"
