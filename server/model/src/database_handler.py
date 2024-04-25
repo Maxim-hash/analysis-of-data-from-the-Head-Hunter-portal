@@ -10,8 +10,10 @@ from model.src.Query_Builder import *
 
 class Database_handler:
     def __init__(self) -> None:
-        self.async_engine = create_async_engine(url=settings.DATABASE_URL(), echo=True)
+        self.async_engine = create_async_engine(url=settings.ASYNC_DATABASE_URL(), echo=True)
         self.async_session_factory = sessionmaker(self.async_engine, class_=AsyncSession)
+        self.sync_engine = create_engine(url=settings.SYNC_DATABASE_URL(), echo=True)
+        self.sync_session_factory = sessionmaker(self.sync_engine)
 
     async def execute(self, string, commit=False):
         async with self.async_engine.connect() as conn:
@@ -35,14 +37,16 @@ class Database_handler:
                 session.add(data)
         return True
             
-    async def select(self, data):
-        async with self.async_session_factory() as session:
-            query_builder = QueryBuilder()
-            query_builder.add_filter(ProfessionFilter(data[0]))
-            query_builder.add_filter(RegionFilter(data[1]))
-            query_builder.add_filter(ExperienceFilter(data[2]))
-            query = query_builder.build()
-            result = query.all()
+    def select(self, data):
+        with self.sync_session_factory() as session:
+            with session.begin():
+                query_builder = QueryBuilder(session)
+                query_builder.add_filter(ProfessionFilter(data[0]))
+                query_builder.add_filter(RegionFilter(session, data[1]))
+                query_builder.add_filter(ExperienceFilter(data[2]))
+                query = query_builder.build()
+                result = query.all()
+                session.expunge_all()
 
             return result 
 

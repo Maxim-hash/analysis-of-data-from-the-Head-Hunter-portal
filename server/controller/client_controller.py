@@ -13,7 +13,7 @@ class client_controller(controller):
         elif splitted_data[0] == "login":
             result = asyncio.run(model.login(splitted_data[1]))
         elif splitted_data[0] == "get":
-            result = asyncio.run(model.get(splitted_data[1]))
+            result = model.get(splitted_data[1])
         else:
             result = "Incorrect Data"
         

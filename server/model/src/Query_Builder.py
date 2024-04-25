@@ -43,7 +43,7 @@ class RegionFilter(FilterInterface):
                 # Получаем все подрегионы для указанного региона
                 all_region_ids = self._get_all_subregions(region_id)
                 # Применяем фильтр к запросу
-                return query.filter(VacancyOrm.region_id.in_(all_region_ids))
+                return query.filter(VacancyOrm.area_id.in_(all_region_ids))
         return query
 
     def _get_all_subregions(self, parent_id):

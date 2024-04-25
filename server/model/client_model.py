@@ -46,7 +46,12 @@ class client_model():
         return self.return_code["Access"] + "0"
 
     @parse_input
-    async def get(self, decoded_data):
+    def get(self, decoded_data):
         db_handler = Database_handler()
-        
-        return "Success"
+        result = db_handler.select(decoded_data)
+        result_string = ""
+        for item in result:
+            result_string += f"{item.id}:{item.name}:{item.exp}:{item.empoyment},"
+        if len(result_string) == 0:
+            result_string = "None"
+        return result_string
