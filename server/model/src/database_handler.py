@@ -37,18 +37,24 @@ class Database_handler:
                 session.add(data)
         return True
             
-    def select(self, data):
+    def select(self, data, mode):
         with self.sync_session_factory() as session:
-            with session.begin():
-                query_builder = QueryBuilder(session)
-                query_builder.add_filter(ProfessionFilter(data[0]))
-                query_builder.add_filter(RegionFilter(session, data[1]))
-                query_builder.add_filter(ExperienceFilter(data[2]))
+            with session.begin(): 
+                if mode == "Vacancy":
+                    query_builder = QueryBuilder(session, VacancyOrm)
+                    query_builder.add_filter(ProfessionFilter(data[0]))
+                    query_builder.add_filter(RegionFilter(session, data[1]))
+                    query_builder.add_filter(ExperienceFilter(data[2]))
+                elif mode == "Salary":
+                    query_builder = QueryBuilder(session, SalaryOrm)
+                    query_builder.add_filter(IdFilter(data.id))
+                
                 query = query_builder.build()
+                
                 result = query.all()
                 session.expunge_all()
 
-            return result 
+            return result
 
 
     async def insert_into_table(self, formatted_data):

@@ -30,6 +30,7 @@ class MainWindow(Tk, Singleton):
         self.sub_forms.append(SubForms(self.notebook, result, self.delete_form))
         self.sub_forms[-1].pack(expand=True, fill=BOTH)
         self.notebook.add(self.sub_forms[-1], text=form_name)
+        self.notebook.select(len(self.sub_forms) + 1)
 
     def delete_form(self, index):
         self.sub_forms.pop(index - 2)
@@ -44,7 +45,6 @@ class SubForms(Frame):
         self.close_button = ttk.Button(self, text='Закрыть', command=lambda: self.close_tab(self, callback))
         self.close_button.pack(anchor=NE, padx=10, pady=10)
         self._update_result_labels(data)
-        
 
     def close_tab(self, tab, callback):
         # Закрытие указанной вкладки
@@ -52,18 +52,14 @@ class SubForms(Frame):
         self.master.forget(index)
         callback(index)
 
-
     def _update_result_labels(self, result):
         if self.result_labels != []:
             for i in self.result_labels:
                 i["text"] = ''
                 i.destroy()
             self.result_labels = []
-        items = result.split(",")
-        for item in items:
-            self.result_labels.append(Label(self, text=item))
-            self.result_labels[-1].pack()
-
+        items = result.split("\n")
+        self.result_labels.extend(list(map(lambda x: Label(self, text=x).pack(), items)))
 
 
 class SearchForm(Frame, Singleton):
@@ -72,7 +68,7 @@ class SearchForm(Frame, Singleton):
         self.on_search = on_search
         self.create_new_form = extension
         self.exp_meta = {
-            "Не имеет значения" : "",
+            "Не имеет значения" : "%",
             "От 1 года до 3 лет" : "between1And3",
             "Нет опыта" : "noExperience",
             "От 3 до 6 лет" : "between3And6",
@@ -119,7 +115,6 @@ class SearchForm(Frame, Singleton):
         self.create_new_form(self.on_search(vacancy_name, area, exp), vacancy_name)
         #self._update_result_labels(self.on_search(vacancy_name, area, exp))
 
-
 def search(vacancy_name, area, exp):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     request_builder = Requst_Builder("get")
@@ -130,7 +125,7 @@ def search(vacancy_name, area, exp):
         request = request_builder.build()
         sock.send(request.encode(config.encoding))
 
-        data = sock.recv(2048)
+        data = sock.recv(10485760)
         if data:
             return f"Your request: {data.decode(config.encoding)}"
         sock.close()

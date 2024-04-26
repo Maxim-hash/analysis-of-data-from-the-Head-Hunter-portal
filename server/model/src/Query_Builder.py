@@ -1,15 +1,16 @@
 from typing import List, Type
 from sqlalchemy.orm import Session
-from model.src.Orms import VacancyOrm, AreaOrm
+from model.src.Orms import VacancyOrm, AreaOrm, SalaryOrm
 
 class FilterInterface:
     def apply(self, query):
         raise NotImplementedError
     
 class QueryBuilder:
-    def __init__(self, session: Session):
+    def __init__(self, session: Session, mode):
         self.session = session
-        self.query = session.query(VacancyOrm)
+        self.mode = mode
+        self.query = session.query(mode)
         self.filters: List[FilterInterface] = []
 
     def add_filter(self, filter: FilterInterface):
@@ -27,7 +28,7 @@ class ProfessionFilter(FilterInterface):
 
     def apply(self, query):
         if self.profession:
-            return query.filter(VacancyOrm.name == self.profession)
+            return query.filter(VacancyOrm.name.like(f"%{self.profession}%"))
         return query
     
 class RegionFilter(FilterInterface):
@@ -61,5 +62,14 @@ class ExperienceFilter(FilterInterface):
     def apply(self, query):
         if self.experience is not None:
             return query.filter(VacancyOrm.exp == self.experience)
+        return query
+    
+class IdFilter(FilterInterface):
+    def __init__(self, id: int):
+        self.id = id
+
+    def apply(self, query):
+        if self.id is not None:
+            return query.filter(SalaryOrm.id == self.id)
         return query
 

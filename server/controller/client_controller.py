@@ -1,11 +1,11 @@
 import asyncio
 from controller.controller import controller
-from model.client_model import client_model 
+from model.client_model import ClientModel 
 
 class client_controller(controller):
     @staticmethod
     def handle(ip, data):
-        model = client_model()
+        model = ClientModel()
         splitted_data = data.split(" ")
 
         if splitted_data[0] == "auth": 

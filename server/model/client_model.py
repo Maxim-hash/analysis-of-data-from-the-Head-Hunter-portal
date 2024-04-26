@@ -4,7 +4,7 @@ import model
 from model.src.database_handler import *
 import base64
 
-class client_model():
+class ClientModel():
     def __init__(self) -> None:
         self.return_code = {
             "Access" : "20",
@@ -48,10 +48,15 @@ class client_model():
     @parse_input
     def get(self, decoded_data):
         db_handler = Database_handler()
-        result = db_handler.select(decoded_data)
-        result_string = ""
+        result = db_handler.select(decoded_data, "Vacancy")
+        result_salary = []
         for item in result:
-            result_string += f"{item.id}:{item.name}:{item.exp}:{item.empoyment},"
+            result_salary.extend(db_handler.select(item, "Salary"))
+        result_string = ""
+        for item in range(len(result)):
+            temp1 = list(result[item].__dict__.values())
+            temp2 = list(result_salary[item].__dict__.values())
+            result_string += ":".join(map(str, temp1[1:])) + ":" + ":".join(map(str, temp2[1:])) + "\n"
         if len(result_string) == 0:
             result_string = "None"
         return result_string
