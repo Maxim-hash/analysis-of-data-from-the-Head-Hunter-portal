@@ -132,7 +132,6 @@ class Area_Formattter(Formatter):
 
         return self.data
 
-
     def dop_format(self, b):
         if b == []:
             return  

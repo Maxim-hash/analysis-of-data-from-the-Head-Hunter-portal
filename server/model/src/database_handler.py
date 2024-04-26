@@ -56,7 +56,6 @@ class Database_handler:
 
             return result
 
-
     async def insert_into_table(self, formatted_data):
         async with self.async_session_factory() as session:
             try:    
