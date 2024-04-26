@@ -10,6 +10,7 @@ class MainWindow(Tk, Singleton):
         super().__init__() 
         self.title("HeadHunder client")
         self.geometry("1280x720")
+        self.sub_forms = []
 
         self.makeUI()
 
@@ -17,23 +18,59 @@ class MainWindow(Tk, Singleton):
         self.notebook = ttk.Notebook()
         self.notebook.pack(expand=True, fill=BOTH)
         self.settingFrame = ttk.Frame(self.notebook)
-        self.vacancy_name_frame = SearchForm(self.notebook, search)
-        self.add_new_form = ttk.Frame(self.notebook)
+        self.main_frame = SearchForm(self.notebook, search, self.create_new_form)
 
         self.settingFrame.pack(expand=True, fill=BOTH)
-        self.vacancy_name_frame.pack(expand=True, fill=BOTH)
-        self.add_new_form.pack(expand=True, fill=BOTH)
-        self.notebook.add(self.settingFrame, text="Действия")
-        self.notebook.add(self.vacancy_name_frame, text="Новая вкладка")
-        self.notebook.add(self.add_new_form, text="+")
+        self.main_frame.pack(expand=True, fill=BOTH)
+
+        self.notebook.add(self.settingFrame, text="Настройки")
+        self.notebook.add(self.main_frame, text="Главная")
+
+    def create_new_form(self, result, form_name):
+        self.sub_forms.append(SubForms(self.notebook, result, self.delete_form))
+        self.sub_forms[-1].pack(expand=True, fill=BOTH)
+        self.notebook.add(self.sub_forms[-1], text=form_name)
+
+    def delete_form(self, index):
+        self.sub_forms.pop(index - 2)
 
     def __init__(self):
         pass
 
+class SubForms(Frame):
+    def __init__(self, master, data, callback):
+        super().__init__(master=master)
+        self.result_labels = list()
+        self.close_button = ttk.Button(self, text='Закрыть', command=lambda: self.close_tab(self, callback))
+        self.close_button.pack(anchor=NE, padx=10, pady=10)
+        self._update_result_labels(data)
+        
+
+    def close_tab(self, tab, callback):
+        # Закрытие указанной вкладки
+        index = self.master.index(tab)
+        self.master.forget(index)
+        callback(index)
+
+
+    def _update_result_labels(self, result):
+        if self.result_labels != []:
+            for i in self.result_labels:
+                i["text"] = ''
+                i.destroy()
+            self.result_labels = []
+        items = result.split(",")
+        for item in items:
+            self.result_labels.append(Label(self, text=item))
+            self.result_labels[-1].pack()
+
+
+
 class SearchForm(Frame, Singleton):
-    def __init__(self, master, on_search):
+    def __init__(self, master, on_search, extension):
         super().__init__(master=master)
         self.on_search = on_search
+        self.create_new_form = extension
         self.exp_meta = {
             "Не имеет значения" : "",
             "От 1 года до 3 лет" : "between1And3",
@@ -79,7 +116,8 @@ class SearchForm(Frame, Singleton):
         vacancy_name = self.entry_vacancy_name.get()
         area = self.entry_area.get()
         exp = self.selected_exp.get()
-        self._update_result_labels(self.on_search(vacancy_name, area, exp))
+        self.create_new_form(self.on_search(vacancy_name, area, exp), vacancy_name)
+        #self._update_result_labels(self.on_search(vacancy_name, area, exp))
 
 
 def search(vacancy_name, area, exp):

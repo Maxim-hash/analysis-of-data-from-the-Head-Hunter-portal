@@ -60,6 +60,6 @@ class ExperienceFilter(FilterInterface):
 
     def apply(self, query):
         if self.experience is not None:
-            return query.filter(VacancyOrm.exp >= self.experience)
+            return query.filter(VacancyOrm.exp == self.experience)
         return query
 
