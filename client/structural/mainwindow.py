@@ -41,6 +41,7 @@ class MainWindow(Tk, Singleton):
 class SubForms(Frame):
     def __init__(self, master, data, callback):
         super().__init__(master=master)
+        self.count_vacancy = Label(self, text='')
         self.result_labels = list()
         self.close_button = ttk.Button(self, text='Закрыть', command=lambda: self.close_tab(self, callback))
         self.close_button.pack(anchor=NE, padx=10, pady=10)
@@ -59,8 +60,9 @@ class SubForms(Frame):
                 i.destroy()
             self.result_labels = []
         items = result.split("\n")
+        self.count_vacancy["text"] = f"Количество вакансий: {len(items)}"
+        self.count_vacancy.pack(anchor=NW)
         self.result_labels.extend(list(map(lambda x: Label(self, text=x).pack(), items)))
-
 
 class SearchForm(Frame, Singleton):
     def __init__(self, master, on_search, extension):
