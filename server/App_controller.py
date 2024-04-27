@@ -1,3 +1,4 @@
+import json
 import socket
 from config import port, max_users, encoding
 from controller.client_controller import client_controller
@@ -19,13 +20,14 @@ class Server:
             print ('connected:', addr)
 
             data = conn.recv(1024).decode(encoding)
+            parsed_data = json.loads(data)
             msg = ''
             #data.decode(config.encoding)
             if not data:
                 break
             else:
-                print(f"{addr} send message {data}")
-                msg = client_controller.handle(addr[0], data)        
+                print(f"{addr} send message {parsed_data}")
+                msg = client_controller.handle(addr[0], parsed_data)        
                 conn.send(msg.encode(encoding))
         
         conn.close()

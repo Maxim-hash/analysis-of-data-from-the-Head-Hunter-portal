@@ -3,7 +3,7 @@ from tkinter import *
 from tkinter import ttk
 from structural.config import *
 from creational.singleton import Singleton
-from structural.src.request_builder import Requst_Builder
+from structural.src.request_builder import *
 
 class AutorizationWindow(Tk, Singleton):
     def init(self, on_success=None):
@@ -23,15 +23,15 @@ class AutorizationWindow(Tk, Singleton):
 
     def login(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        a = Requst_Builder("login")
+        
         try:
             sock.connect((host_ip, port))
 
             login = self.entry_login.get()
             password = self.entry_password.get()
-            a.add_item((login, password))
-            b = a.build()
-            sock.send(b.encode(encoding))
+            builder = JSONRequestBuilder(LoginRequestTemplate(login, password))
+            message = builder.build()
+            sock.send(message.encode(encoding))
 
             resp = sock.recv(1024)
             self.data = resp.decode(encoding)
@@ -40,7 +40,6 @@ class AutorizationWindow(Tk, Singleton):
                 self.on_success()
             else:
                 self.errorLabel['text'] = "Ошибка в ведённых данных"
-                self.entry_login.delete(0, END)
                 self.entry_password.delete(0, END)
                 self.errorLabel.pack()
         except:
@@ -52,13 +51,13 @@ class AutorizationWindow(Tk, Singleton):
             
     def auth(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        a = Requst_Builder("auth")
         try:
             sock.connect((host_ip, port))
-
-            a.add_item((self.entry_login.get(), self.entry_password.get()))
-            b = a.build()
-            sock.send(b.encode(encoding))
+            login = self.entry_login.get()
+            password = self.entry_password.get()
+            builder = JSONRequestBuilder(AuthRequestTemplate(login, password))
+            message = builder.build()
+            sock.send(message.encode(encoding))
 
             resp = sock.recv(1024)
             self.data = resp.decode(encoding)

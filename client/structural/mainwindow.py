@@ -3,7 +3,7 @@ from tkinter import *
 from tkinter import ttk
 from structural import config
 from creational.singleton import Singleton
-from structural.src.request_builder import Requst_Builder
+from structural.src.request_builder import *
 
 class MainWindow(Tk, Singleton):
     def init(self):
@@ -119,13 +119,13 @@ class SearchForm(Frame, Singleton):
 
 def search(vacancy_name, area, exp):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    request_builder = Requst_Builder("get")
+    
     try:
         sock.connect((config.host_ip, config.port))
-
-        request_builder.add_item((vacancy_name, area, exp))
-        request = request_builder.build()
-        sock.send(request.encode(config.encoding))
+        request_builder = JSONRequestBuilder(GetRequestTemplate(vacancy_name, area, exp))
+       
+        message = request_builder.build()
+        sock.send(message.encode(config.encoding))
 
         data = sock.recv(10485760)
         if data:

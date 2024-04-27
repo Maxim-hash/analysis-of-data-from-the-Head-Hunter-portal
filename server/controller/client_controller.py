@@ -4,16 +4,15 @@ from model.client_model import ClientModel
 
 class client_controller(controller):
     @staticmethod
-    def handle(ip, data):
+    def handle(ip, data: dict):
         model = ClientModel()
-        splitted_data = data.split(" ")
-
-        if splitted_data[0] == "auth": 
-            result = asyncio.run(model.auth(splitted_data[1], ip))
-        elif splitted_data[0] == "login":
-            result = asyncio.run(model.login(splitted_data[1]))
-        elif splitted_data[0] == "get":
-            result = model.get(splitted_data[1])
+        needed_data = {key : value for key, value in data.items() if key != "action"}
+        if data['action'] == "auth": 
+            result = asyncio.run(model.auth(needed_data, ip))
+        elif data['action'] == "login":
+            result = asyncio.run(model.login(needed_data))
+        elif data['action'] == "get":
+            result = model.get(needed_data)
         else:
             result = "Incorrect Data"
         
