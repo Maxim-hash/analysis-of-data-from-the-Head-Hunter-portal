@@ -41,12 +41,12 @@ class Database_handler:
         with self.sync_session_factory() as session:
             with session.begin(): 
                 if mode == "Vacancy":
-                    query_builder = QueryBuilder(session, VacancyOrm)
+                    query_builder = DBQueryBuilder(session, VacancyOrm)
                     query_builder.add_filter(ProfessionFilter(data["vacancy_name"]))
                     query_builder.add_filter(RegionFilter(session, data["area"]))
                     query_builder.add_filter(ExperienceFilter(data["exp"]))
                 elif mode == "Salary":
-                    query_builder = QueryBuilder(session, SalaryOrm)
+                    query_builder = DBQueryBuilder(session, SalaryOrm)
                     query_builder.add_filter(IdFilter(data.id))
                 
                 query = query_builder.build()
