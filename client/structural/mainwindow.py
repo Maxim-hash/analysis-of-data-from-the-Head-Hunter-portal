@@ -61,10 +61,14 @@ class SubForms(Frame):
     def show_stat(self, data:dict):
         df = pd.DataFrame(data.values(), index=data.keys())
         fig, ax = plt.subplots()
-        ax.hist(df["s_from"], bins=10, color="skyblue", edgecolor='black')
+        ax.hist(df["salary"], bins=10, color="skyblue", edgecolor='black')
         ax.set_xlabel("Salary")
         ax.set_ylabel("Frequency")
         ax.set_title("Salary Distribution")
+
+        sample_size = len(df["salary"])
+        plt.text(0.5, 45, f'Sample Size: {sample_size}', fontsize=12, color='black')
+
 
         self.canvas = FigureCanvasTkAgg(fig, master=self)
         self.canvas.draw()
