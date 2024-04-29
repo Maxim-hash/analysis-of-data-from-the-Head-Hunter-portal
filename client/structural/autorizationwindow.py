@@ -35,7 +35,7 @@ class AutorizationWindow(Tk, Singleton):
 
             resp = sock.recv(1024)
             self.data = resp.decode(encoding)
-            if self.data == "200":
+            if "200" in self.data :
                 sock.close()
                 self.on_success()
             else:
@@ -61,7 +61,7 @@ class AutorizationWindow(Tk, Singleton):
 
             resp = sock.recv(1024)
             self.data = resp.decode(encoding)
-            if self.data == "200":
+            if "200" in self.data:
                 sock.close()
                 self.on_success()
             else:

@@ -1,5 +1,6 @@
 import asyncio
 import functools
+import json
 import model
 from model.src.database_handler import *
 import base64
@@ -38,11 +39,12 @@ class ClientModel():
         result_salary = []
         for item in result:
             result_salary.extend(db_handler.select(item, "Salary"))
-        result_string = ""
-        for item in range(len(result)):
-            temp1 = list(result[item].__dict__.values())
-            temp2 = list(result_salary[item].__dict__.values())
-            result_string += ":".join(map(str, temp1[1:])) + ":" + ":".join(map(str, temp2[1:])) + "\n"
-        if len(result_string) == 0:
-            result_string = "None"
-        return result_string
+        answer = {}
+        for item_vac, item_sal in zip(result, result_salary):
+            object = {**(item_vac.__dict__), **(item_sal.__dict__)}
+            object.pop('_sa_instance_state', None)
+            answer[f"{object['id']}"] = object.copy()
+            answer[f"{object['id']}"].pop("id", None)
+        if len(answer) == 0:
+            answer["202"] = "None"
+        return json.dumps(answer)

@@ -4,6 +4,10 @@ from tkinter import ttk
 from structural import config
 from creational.singleton import Singleton
 from structural.src.request_builder import *
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib.pyplot as plt
+import pandas as pd
 
 class MainWindow(Tk, Singleton):
     def init(self):
@@ -45,7 +49,8 @@ class SubForms(Frame):
         self.result_labels = list()
         self.close_button = ttk.Button(self, text='Закрыть', command=lambda: self.close_tab(self, callback))
         self.close_button.pack(anchor=NE, padx=10, pady=10)
-        self._update_result_labels(data)
+        self.show_stat(data)
+        #self._update_result_labels(data)
 
     def close_tab(self, tab, callback):
         # Закрытие указанной вкладки
@@ -53,16 +58,27 @@ class SubForms(Frame):
         self.master.forget(index)
         callback(index)
 
-    def _update_result_labels(self, result):
+    def show_stat(self, data:dict):
+        df = pd.DataFrame(data.values(), index=data.keys())
+        fig, ax = plt.subplots()
+        ax.hist(df["s_from"], bins=10, color="skyblue", edgecolor='black')
+        ax.set_xlabel("Salary")
+        ax.set_ylabel("Frequency")
+        ax.set_title("Salary Distribution")
+
+        self.canvas = FigureCanvasTkAgg(fig, master=self)
+        self.canvas.draw()
+        self.canvas.get_tk_widget().pack()
+
+    def _update_result_labels(self, result:dict):
         if self.result_labels != []:
             for i in self.result_labels:
                 i["text"] = ''
                 i.destroy()
             self.result_labels = []
-        items = result.split("\n")
-        self.count_vacancy["text"] = f"Количество вакансий: {len(items)}"
+        self.count_vacancy["text"] = f"Количество вакансий: {len(result)}"
         self.count_vacancy.pack(anchor=NW)
-        self.result_labels.extend(list(map(lambda x: Label(self, text=x).pack(), items)))
+        self.result_labels.extend(list(map(lambda x: Label(self, text=x).pack(), result.values())))
 
 class SearchForm(Frame, Singleton):
     def __init__(self, master, on_search, extension):
@@ -104,8 +120,8 @@ class SearchForm(Frame, Singleton):
                 i["text"] = ''
                 i.destroy()
             self.result_labels = []
-        items = result.split(",")
-        for item in items:
+        #items = result.split(",")
+        for item in result:
             self.result_labels.append(Label(self, text=item))
             self.result_labels[-1].pack()
 
@@ -126,11 +142,20 @@ def search(vacancy_name, area, exp):
        
         message = request_builder.build()
         sock.send(message.encode(config.encoding))
-
-        data = sock.recv(10485760)
-        if data:
-            return f"Your request: {data.decode(config.encoding)}"
+        answer = b""
+        end_signal = b"<END>"
+        while True:
+            data = sock.recv(1024)
+            answer += data
+            if end_signal in data:
+                break
+        answer = answer.decode(config.encoding)
+        answer = json.loads(answer[:-5])
+        
         sock.close()
+        return answer
+    except Exception as error:
+        print("Произошла ошибка:", error)
     except:
         print("На сервере ведутся технические работы приносим свои извинение за предоставленные неудобства."
             "\nПопробуйте повторить попытку через пару минут")

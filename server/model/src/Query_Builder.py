@@ -6,7 +6,7 @@ class FilterInterface:
     def apply(self, query):
         raise NotImplementedError
     
-class QueryBuilder:
+class DBQueryBuilder:
     def __init__(self, session: Session, mode):
         self.session = session
         self.mode = mode

@@ -7,6 +7,7 @@ import asyncio
 
 class Server:
     def __init__(self):
+        self.block_size = 1024
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.bind((socket.gethostbyname(socket.gethostname()), port))
         self.server.listen(max_users)
@@ -22,13 +23,12 @@ class Server:
             data = conn.recv(1024).decode(encoding)
             parsed_data = json.loads(data)
             msg = ''
-            #data.decode(config.encoding)
-            if not data:
-                break
-            else:
-                print(f"{addr} send message {parsed_data}")
-                msg = client_controller.handle(addr[0], parsed_data)        
-                conn.send(msg.encode(encoding))
+
+            print(f"{addr} send message {parsed_data}")
+            msg = client_controller.handle(addr[0], parsed_data).encode(encoding)
+            end_signal = b"<END>"
+            conn.sendall(msg + end_signal)
+
         
         conn.close()
 
