@@ -43,11 +43,26 @@ class MainWindow(Tk, Singleton):
 class SubForms(Frame):
     def __init__(self, master, data, callback):
         super().__init__(master=master)
-        self.count_vacancy = Label(self, text='')
-        self.result_labels = list()
-        self.close_button = ttk.Button(self, text='Закрыть', command=lambda: self.close_tab(self, callback))
-        self.close_button.pack(anchor=NE, padx=10, pady=10)
+        self.canvas = Canvas(self)
+        self.scrollbar = Scrollbar(self, orient="vertical", command=self.canvas.yview)
+        self.scrollable_frame = Frame(self.canvas)
+        self.canvas.pack(side="left", fill="both", expand=True)
+        self.scrollbar.pack(side="right", fill="y")
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+
+        def onFrameConfigure(canvas):
+            canvas.configure(scrollregion=canvas.bbox("all"))
+        self.canvas.bind("<MouseWheel>", self._on_mousewheel)
+        self.scrollable_frame.bind("<Configure>", lambda event, canvas=self.canvas: onFrameConfigure(canvas))
+
+        self.count_vacancy = Label(self.scrollable_frame, text='')
+        self.close_button = ttk.Button(self.scrollable_frame, text='Закрыть', command=lambda: self.close_tab(self, callback))
+    
         self.show_stat(data)
+
+    def _on_mousewheel(self, event):
+        self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
 
     def close_tab(self, tab, callback):
         # Закрытие указанной вкладки
@@ -56,8 +71,17 @@ class SubForms(Frame):
         callback(index)
 
     def show_stat(self, request:RequestContext):
-        base_histogram = BaseHistogram(request)
-        base_histogram.draw(self)
+        data = DataTransmitter(request.data)
+        base_histogram1 = BaseHistogram(request)
+        base_histogram1.draw(self.scrollable_frame)
+        uniq_exp = data.getUniqMeta()
+        exp_histograms = []
+        for i in uniq_exp:
+            exp_histograms.append(BaseHistogram(request))
+            exp_histograms[-1].set_data_frame(data.filterDataByExp(i))
+            exp_histograms[-1].draw(self.scrollable_frame)        
+        #base_histogram2 = BaseHistogram(request)
+        #base_histogram2.draw(self.scrollable_frame)
 
     def _update_result_labels(self, result:dict):
         if self.result_labels != []:
@@ -139,7 +163,6 @@ def search(vacancy_name, area, exp):
                 break
         answer = answer[:-5].decode(config.encoding)
         answer = json.loads(answer)
-        
         
         sock.close()
         return RequestContext(answer, json.loads(request))
