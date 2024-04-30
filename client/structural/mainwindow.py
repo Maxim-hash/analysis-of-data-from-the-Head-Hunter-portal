@@ -4,10 +4,8 @@ from tkinter import ttk
 from structural import config
 from creational.singleton import Singleton
 from structural.src.request_builder import *
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import matplotlib.pyplot as plt
-import pandas as pd
+from structural.src.graphs import *
+from structural.src.request_context import *
 
 class MainWindow(Tk, Singleton):
     def init(self):
@@ -57,21 +55,9 @@ class SubForms(Frame):
         self.master.forget(index)
         callback(index)
 
-    def show_stat(self, data:dict):
-        df = pd.DataFrame(data.values(), index=data.keys())
-        fig, ax = plt.subplots()
-        ax.hist(df["salary"], bins=10, color="skyblue", edgecolor='black')
-        ax.set_xlabel("Salary")
-        ax.set_ylabel("Frequency")
-        ax.set_title("Salary Distribution")
-
-        sample_size = len(df["salary"])
-        plt.text(0.5, 45, f'Sample Size: {sample_size}', fontsize=12, color='black')
-
-
-        self.canvas = FigureCanvasTkAgg(fig, master=self)
-        self.canvas.draw()
-        self.canvas.get_tk_widget().pack()
+    def show_stat(self, request:RequestContext):
+        base_histogram = BaseHistogram(request)
+        base_histogram.draw(self)
 
     def _update_result_labels(self, result:dict):
         if self.result_labels != []:
@@ -135,7 +121,6 @@ class SearchForm(Frame, Singleton):
         exp = self.selected_exp.get()
         self.create_new_form(self.on_search(vacancy_name, area, exp), vacancy_name)
 
-
 def search(vacancy_name, area, exp):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     
@@ -143,8 +128,9 @@ def search(vacancy_name, area, exp):
         sock.connect((config.host_ip, config.port))
         request_builder = JSONRequestBuilder(GetRequestTemplate(vacancy_name, area, exp))
        
-        message = request_builder.build()
-        sock.send(message.encode(config.encoding))
+        request = request_builder.build()
+        message = request.encode(config.encoding)
+        sock.send(message)
         answer = b""
         end_signal = b"<END>"
         while True:
@@ -152,11 +138,12 @@ def search(vacancy_name, area, exp):
             answer += data
             if end_signal in data:
                 break
-        answer = answer.decode(config.encoding)
-        answer = json.loads(answer[:-5])
+        answer = answer[:-5].decode(config.encoding)
+        answer = json.loads(answer)
+        
         
         sock.close()
-        return answer
+        return RequestContext(answer, json.loads(request))
     except Exception as error:
         print("Произошла ошибка:", error)
     except:
