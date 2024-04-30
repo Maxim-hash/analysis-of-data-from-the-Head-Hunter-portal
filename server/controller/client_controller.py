@@ -12,7 +12,7 @@ class client_controller(controller):
         elif data['action'] == "login":
             result = asyncio.run(model.login(needed_data))
         elif data['action'] == "get":
-            result = model.get(needed_data)
+            result = asyncio.run(model.get(needed_data))
         else:
             result = "Incorrect Data"
         

@@ -114,7 +114,6 @@ class SearchForm(Frame, Singleton):
             self.result_labels.append(Label(self, text=item))
             self.result_labels[-1].pack()
 
-
     def _on_search_clicked(self):
         vacancy_name = self.entry_vacancy_name.get()
         area = self.entry_area.get()

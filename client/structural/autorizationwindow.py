@@ -22,58 +22,47 @@ class AutorizationWindow(Tk, Singleton):
         ttk.Button(self, text="Registration", command=self.auth).pack(padx=5, pady=5)
 
     def login(self):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        
-        try:
-            sock.connect((host_ip, port))
+        login = self.entry_login.get()
+        password = self.entry_password.get()
+        builder = JSONRequestBuilder(LoginRequestTemplate(login, password))
+        message = builder.build()
+        self.data = authorization(message)
 
-            login = self.entry_login.get()
-            password = self.entry_password.get()
-            builder = JSONRequestBuilder(LoginRequestTemplate(login, password))
-            message = builder.build()
-            sock.send(message.encode(encoding))
-
-            resp = sock.recv(1024)
-            self.data = resp.decode(encoding)
-            if "200" in self.data :
-                sock.close()
-                self.on_success()
-            else:
-                self.errorLabel['text'] = "Ошибка в ведённых данных"
-                self.entry_password.delete(0, END)
-                self.errorLabel.pack()
-        except:
-            self.entry_login.delete(0, END)
+        if "200" in self.data:
+            self.on_success()
+        else:
+            self.errorLabel['text'] = "Ошибка введённых данных"
             self.entry_password.delete(0, END)
-            sock.close()
-            print("На сервере ведутся технические работы приносим свои извинение за предоставленные неудобства."
-                  "\nПопробуйте повторить попытку через пару минут")
+            self.errorLabel.pack()
             
     def auth(self):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        try:
-            sock.connect((host_ip, port))
-            login = self.entry_login.get()
-            password = self.entry_password.get()
-            builder = JSONRequestBuilder(AuthRequestTemplate(login, password))
-            message = builder.build()
-            sock.send(message.encode(encoding))
+        login = self.entry_login.get()
+        password = self.entry_password.get()
+        builder = JSONRequestBuilder(AuthRequestTemplate(login, password))
+        message = builder.build()
+        self.data = authorization(message)
 
-            resp = sock.recv(1024)
-            self.data = resp.decode(encoding)
-            if "200" in self.data:
-                sock.close()
-                self.on_success()
-            else:
-                self.errorLabel['text'] = "Такой пользователь уже зарегистрирован"
-                self.entry_login.delete(0, END)
-                self.entry_password.delete(0, END)
-                self.errorLabel.pack()
-        except:
+        if "200" in self.data:
+            self.on_success()
+        else:
+            self.errorLabel['text'] = "Такой пользователь уже зарегистрирован"
             self.entry_login.delete(0, END)
             self.entry_password.delete(0, END)
-            sock.close()
-            print("На сервере ведутся технические работы приносим свои извинение за предоставленные неудобства."
-                  "\nПопробуйте повторить попытку через пару минут")
+            self.errorLabel.pack()
+
     def __init__(self, *args):
         pass
+
+def authorization(message:str):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        sock.connect((host_ip, port))
+        sock.send(message.encode(encoding))
+        resp = sock.recv(1024)
+        data = resp.decode(encoding)[:-5]
+    except:
+        data = "202"
+        print("На сервере ведутся технические работы приносим свои извинение за предоставленные неудобства."
+              "\nПопробуйте повторить попытку через пару минут")
+    sock.close()
+    return data

@@ -33,7 +33,7 @@ class ClientModel():
 
         return self.return_code["Access"] + "0"
 
-    def get(self, decoded_data):
+    async def get(self, decoded_data):
         db_handler = Database_handler()
         result = db_handler.select(decoded_data, "Vacancy")
         salary = []
