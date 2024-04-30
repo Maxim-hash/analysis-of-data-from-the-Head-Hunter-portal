@@ -50,7 +50,6 @@ class SubForms(Frame):
         self.close_button = ttk.Button(self, text='Закрыть', command=lambda: self.close_tab(self, callback))
         self.close_button.pack(anchor=NE, padx=10, pady=10)
         self.show_stat(data)
-        #self._update_result_labels(data)
 
     def close_tab(self, tab, callback):
         # Закрытие указанной вкладки
@@ -124,7 +123,7 @@ class SearchForm(Frame, Singleton):
                 i["text"] = ''
                 i.destroy()
             self.result_labels = []
-        #items = result.split(",")
+
         for item in result:
             self.result_labels.append(Label(self, text=item))
             self.result_labels[-1].pack()
@@ -135,7 +134,7 @@ class SearchForm(Frame, Singleton):
         area = self.entry_area.get()
         exp = self.selected_exp.get()
         self.create_new_form(self.on_search(vacancy_name, area, exp), vacancy_name)
-        #self._update_result_labels(self.on_search(vacancy_name, area, exp))
+
 
 def search(vacancy_name, area, exp):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
