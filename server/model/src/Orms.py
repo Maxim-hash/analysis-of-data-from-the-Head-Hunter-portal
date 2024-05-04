@@ -12,6 +12,15 @@ class ModeOrm(Base):
     id: Mapped[intpk]
     name: Mapped[str_512]
 
+class JournalOrm(Base):
+    __tablename__ = "journal"
+
+    id: Mapped[intpk]
+    token: Mapped[str_512]
+    action: Mapped[str_512]
+    status: Mapped[bool]
+    time: Mapped[datetime.datetime]
+
 class UserOrm(Base):
     __tablename__ = "user"
 
