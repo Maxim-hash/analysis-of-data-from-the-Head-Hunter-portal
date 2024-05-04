@@ -1,10 +1,14 @@
 from typing import List, Type
+from sqlalchemy import and_, or_
 from sqlalchemy.orm import Session
 from model.src.Orms import VacancyOrm, AreaOrm, SalaryOrm
 
 class FilterInterface:
-    def apply(self, query):
+    def apply(self) -> None:
         raise NotImplementedError
+    
+    def should_use_or_operator(self) -> bool:
+        return False
     
 class DBQueryBuilder:
     def __init__(self, session: Session, mode):
@@ -18,25 +22,79 @@ class DBQueryBuilder:
         return self
 
     def build(self):
+        or_filters = []
+        and_filters = []
+
+        #filters = [filter.apply() for filter in self.filters]
+        #filters = [item for item in filters if item is not None]
+        
         for filter in self.filters:
-            self.query = filter.apply(self.query)
+            if filter.should_use_or_operator():
+                or_filters.append(filter.apply())
+            else:
+                and_filters.append(filter.apply())
+
+        or_filters = [item for item in or_filters if item is not None]
+        and_filters = [item for item in and_filters if item is not None]
+
+        if or_filters:
+            or_filter = or_(*or_filters)
+            if and_filters:
+                and_filter = and_(*and_filters)
+                self.query = self.query.filter(and_(or_filter, and_filter))
+            else:
+                self.query = self.query.filter(or_filter)
+        elif and_filters:
+            self.query = self.query.filter(and_(*and_filters))
+
         return self.query
     
-class ProfessionFilter(FilterInterface):
+class ProfessionNameFilter(FilterInterface):
     def __init__(self, profession: str):
         self.profession = profession
 
-    def apply(self, query):
+    def apply(self):
         if self.profession:
-            return query.filter(VacancyOrm.name.like(f"%{self.profession}%"))
-        return query
+            return VacancyOrm.name.like(f"%{self.profession}%")
+        return None
+    
+    def should_use_or_operator(self) -> bool:
+        return True
+    
+class RequirementFilter(FilterInterface):
+    def __init__(self, requirement) -> None:
+        self.requirement = requirement
+
+    def apply(self):
+        if self.requirement:
+            requirement = self.requirement.split()
+            filters = [VacancyOrm.requirement.like(f"%{filter}%") for filter in requirement]
+            return or_(*filters)
+        return None
+    
+    def should_use_or_operator(self) -> bool:
+        return True
+    
+class ProffessionRoleFilter(FilterInterface):
+    def __init__(self, requirement) -> None:
+        self.prof_role = requirement
+
+    def apply(self):
+        if self.prof_role:
+            prof_roles = self.prof_role.split()
+            filters = [VacancyOrm.prof_roles.like(f"%{filter}%") for filter in prof_roles]
+            return or_(*filters)
+        return None
+    
+    def should_use_or_operator(self) -> bool:
+        return True
     
 class RegionFilter(FilterInterface):
     def __init__(self, session: Session, region_name: str):
             self.session = session
             self.region_name = region_name
 
-    def apply(self, query):
+    def apply(self):
         if self.region_name:
             # Получаем ID региона по его названию
             region_id = self.session.query(AreaOrm.id).filter(AreaOrm.name == self.region_name).scalar()
@@ -44,8 +102,8 @@ class RegionFilter(FilterInterface):
                 # Получаем все подрегионы для указанного региона
                 all_region_ids = self._get_all_subregions(region_id)
                 # Применяем фильтр к запросу
-                return query.filter(VacancyOrm.area_id.in_(all_region_ids))
-        return query
+                return VacancyOrm.area_id.in_(all_region_ids)
+        return None
 
     def _get_all_subregions(self, parent_id):
         """Рекурсивный поиск всех подрегионов для указанного региона"""
@@ -59,17 +117,17 @@ class ExperienceFilter(FilterInterface):
     def __init__(self, experience: int):
         self.experience = experience
 
-    def apply(self, query):
-        if self.experience is not None:
-            return query.filter(VacancyOrm.exp.like(f"%{self.experience}%"))
-        return query
+    def apply(self):
+        if self.experience:
+            return VacancyOrm.exp.like(f"%{self.experience}%")
+        return None
     
 class IdFilter(FilterInterface):
     def __init__(self, id: int):
         self.id = id
 
-    def apply(self, query):
+    def apply(self):
         if self.id is not None:
-            return query.filter(SalaryOrm.id == self.id)
-        return query
+            return SalaryOrm.id == self.id
+        return None
 

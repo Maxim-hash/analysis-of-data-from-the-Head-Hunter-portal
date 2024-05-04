@@ -33,7 +33,7 @@ class ClientModel():
 
         return self.return_code["Access"] + "0"
 
-    async def get(self, decoded_data):
+    def get(self, decoded_data):
         db_handler = Database_handler()
         result = db_handler.select(decoded_data, "Vacancy")
         salary = []
@@ -67,7 +67,7 @@ class СurrencyConverter:
         }
         
     def convert(self, sal : int, cur : str):
-        return int(sal * self.exchange[cur])
+        return int(sal / self.exchange[cur])
 
 def get_salary(salary_ORM_list: List[SalaryOrm]):
     result = []

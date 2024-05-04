@@ -31,9 +31,9 @@ class Graph:
     
 class BaseHistogram(Graph):
     def draw(self, container) -> None:
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(10, 6))
         fig.subplots_adjust(bottom=0.2) 
-        ax.hist(self.dp["salary"], bins=10, color="skyblue", edgecolor='black')
+        ax.hist(self.dp["salary"], bins=15, color="skyblue", edgecolor='black')
         salaries = [int(i) for i in self.dp["salary"] if pd.notnull(i)]
         mean_salary = np.mean(salaries)
         median_salary = np.median(salaries)
@@ -48,7 +48,7 @@ class BaseHistogram(Graph):
         ax.legend(["Среднее", "Медиана"])
         canvas = FigureCanvasTkAgg(fig, master=container)
         canvas.draw()
-        canvas.get_tk_widget().pack()
+        canvas.get_tk_widget().pack(fill="both", expand=True)
 
 
 class SalaryByExperienceHistograms(Graph):

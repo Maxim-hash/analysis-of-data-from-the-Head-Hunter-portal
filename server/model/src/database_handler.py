@@ -42,7 +42,9 @@ class Database_handler:
             with session.begin(): 
                 if mode == "Vacancy":
                     query_builder = DBQueryBuilder(session, VacancyOrm)
-                    query_builder.add_filter(ProfessionFilter(data["vacancy_name"]))
+                    query_builder.add_filter(ProfessionNameFilter(data["vacancy_name"]))
+                    query_builder.add_filter(RequirementFilter(data["vacancy_name"]))
+                    query_builder.add_filter(ProffessionRoleFilter(data["vacancy_name"]))
                     query_builder.add_filter(RegionFilter(session, data["area"]))
                     query_builder.add_filter(ExperienceFilter(data["exp"]))
                 elif mode == "Salary":

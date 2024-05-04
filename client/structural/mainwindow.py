@@ -58,6 +58,7 @@ class SubForms(Frame):
 
         self.count_vacancy = Label(self.scrollable_frame, text='')
         self.close_button = ttk.Button(self.scrollable_frame, text='Закрыть', command=lambda: self.close_tab(self, callback))
+        self.close_button.pack(anchor=NE)
     
         self.show_stat(data)
 
@@ -99,7 +100,7 @@ class SearchForm(Frame, Singleton):
         self.on_search = on_search
         self.create_new_form = extension
         self.exp_meta = {
-            "Не имеет значения" : "%",
+            "Не имеет значения" : "",
             "От 1 года до 3 лет" : "between1And3",
             "Нет опыта" : "noExperience",
             "От 3 до 6 лет" : "between3And6",
