@@ -2,7 +2,7 @@ import base64
 import json
 
 class RequestTemplate:
-    def __init__(self, action : str, **kwargs) -> None:
+    def __init__(self, action : str,  **kwargs) -> None:
         self.action = action
         self.params = kwargs
 
@@ -21,8 +21,8 @@ class AuthRequestTemplate(RequestTemplate):
         super().__init__("auth", login=login, password=password)
     
 class GetRequestTemplate(RequestTemplate):
-    def __init__(self, vacancy_name = "%", area = "%", exp = "%") -> None:
-        super().__init__("get", vacancy_name=vacancy_name, area=area, exp=exp)
+    def __init__(self, token, vacancy_name = "%", area = "%", exp = "%") -> None:
+        super().__init__("get", vacancy_name=vacancy_name, area=area, exp=exp, token=token)
     
 class JSONRequestBuilder:
     def __init__(self, templateRequest: RequestTemplate):

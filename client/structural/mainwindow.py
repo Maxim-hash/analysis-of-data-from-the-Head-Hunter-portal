@@ -8,19 +8,18 @@ from structural.src.graphs import *
 from structural.src.request_context import *
 
 class MainWindow(Tk, Singleton):
-    def init(self):
+    def init(self, token):
         super().__init__() 
         self.title("HeadHunder client")
         self.geometry("1280x720")
         self.sub_forms = []
+        self.makeUI(token)
 
-        self.makeUI()
-
-    def makeUI(self):
+    def makeUI(self, token):
         self.notebook = ttk.Notebook()
         self.notebook.pack(expand=True, fill=BOTH)
-        self.settingFrame = ttk.Frame(self.notebook)
-        self.main_frame = SearchForm(self.notebook, search, self.create_new_form)
+        self.settingFrame = MainForm(self.notebook, token)
+        self.main_frame = SearchForm(self.notebook, search, self.create_new_form, token)
 
         self.settingFrame.pack(expand=True, fill=BOTH)
         self.main_frame.pack(expand=True, fill=BOTH)
@@ -37,8 +36,13 @@ class MainWindow(Tk, Singleton):
     def delete_form(self, index):
         self.sub_forms.pop(index - 2)
 
-    def __init__(self):
+    def __init__(self, token):
         pass
+
+class MainForm(Frame):
+    def __init__(self, master, token):
+        super().__init__(master=master)
+        self.token = token
 
 class SubForms(Frame):
     def __init__(self, master, data, callback):
@@ -95,8 +99,9 @@ class SubForms(Frame):
         self.result_labels.extend(list(map(lambda x: Label(self, text=x).pack(), result.values())))
 
 class SearchForm(Frame, Singleton):
-    def __init__(self, master, on_search, extension):
+    def __init__(self, master, on_search, extension, token):
         super().__init__(master=master)
+        self.token = token
         self.on_search = on_search
         self.create_new_form = extension
         self.exp_meta = {
@@ -143,14 +148,14 @@ class SearchForm(Frame, Singleton):
         vacancy_name = self.entry_vacancy_name.get()
         area = self.entry_area.get()
         exp = self.selected_exp.get()
-        self.create_new_form(self.on_search(vacancy_name, area, exp), vacancy_name)
+        self.create_new_form(self.on_search(self.token, vacancy_name, area, exp), vacancy_name)
 
-def search(vacancy_name, area, exp):
+def search(token, vacancy_name, area, exp):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     
     try:
         sock.connect((config.host_ip, config.port))
-        request_builder = JSONRequestBuilder(GetRequestTemplate(vacancy_name, area, exp))
+        request_builder = JSONRequestBuilder(GetRequestTemplate(token, vacancy_name, area, exp))
        
         request = request_builder.build()
         message = request.encode(config.encoding)
@@ -166,7 +171,7 @@ def search(vacancy_name, area, exp):
         answer = json.loads(answer)
         
         sock.close()
-        return RequestContext(answer, json.loads(request))
+        return RequestContext(answer["data"], json.loads(request))
     except Exception as error:
         print("Произошла ошибка:", error)
     except:

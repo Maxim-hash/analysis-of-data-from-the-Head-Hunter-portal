@@ -9,9 +9,9 @@ class App_Controller:
     def run(self) -> None:
         self.autorizationWindow.mainloop()
 
-    def on_login_success(self):
+    def on_login_success(self, token):
         self.autorizationWindow.destroy()
-        self.window = MainWindow()
+        self.window = MainWindow(token)
         self.window.title("HeadHunder client")
         self.window.geometry("1280x720")
         self.window.mainloop()

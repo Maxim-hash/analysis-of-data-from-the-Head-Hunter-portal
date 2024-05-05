@@ -27,6 +27,7 @@ class UserOrm(Base):
     ip:  Mapped[str_512] 
     email: Mapped[str_512] = mapped_column(primary_key=True)
     password: Mapped[str_512]
+    token: Mapped[str_512]
     mode_id: Mapped[int] = mapped_column(ForeignKey("mode.id", ondelete="CASCADE"))
 
 class AreaOrm(Base):

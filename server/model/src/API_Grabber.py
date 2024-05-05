@@ -145,10 +145,10 @@ class DateIntervalGenerator:
         intervals = []
         current_start_date = self.one_month_ago
         while current_start_date < self.today:
-            current_end_date = current_start_date + timedelta(minutes=60)  # Интервал в один час
+            current_end_date = current_start_date + timedelta(minutes=30)  # Интервал в один час
             intervals.append({
                 'date_from': current_start_date.isoformat(),
                 'date_to': current_end_date.isoformat()
             })
-            current_start_date += timedelta(minutes=65)
+            current_start_date += timedelta(minutes=35)
         return intervals

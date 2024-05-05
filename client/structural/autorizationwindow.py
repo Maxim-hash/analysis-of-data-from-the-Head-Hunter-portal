@@ -28,10 +28,10 @@ class AutorizationWindow(Tk, Singleton):
         message = builder.build()
         self.data = authorization(message)
 
-        if "200" in self.data:
-            self.on_success()
+        if self.data["status"] == "Access":
+            self.on_success(self.data["data"])
         else:
-            self.errorLabel['text'] = "Ошибка введённых данных"
+            self.errorLabel['text'] = self.data["data"]
             self.entry_password.delete(0, END)
             self.errorLabel.pack()
             
@@ -65,4 +65,4 @@ def authorization(message:str):
         print("На сервере ведутся технические работы приносим свои извинение за предоставленные неудобства."
               "\nПопробуйте повторить попытку через пару минут")
     sock.close()
-    return data
+    return json.loads(data)

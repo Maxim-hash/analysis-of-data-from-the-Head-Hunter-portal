@@ -1,16 +1,15 @@
-import asyncio
-import functools
+import jwt
 import json
-import model
 from model.src.database_handler import *
-import base64
+from config import secret_key
+from datetime import datetime
 
 class ClientModel():
     def __init__(self) -> None:
-        self.return_code = {
-            "Access" : "20",
-            "Denied" : "10" 
-            }
+        self.return_data = {
+            "statues" : None,
+            "data" : None
+        }
         
     def handle(self, data):
         return(f"{data} WAS HANDELED")
@@ -18,22 +17,58 @@ class ClientModel():
     async def auth(self, decoded_data, ip):
         db_handler = Database_handler()
         user = await db_handler.get(UserOrm, decoded_data["login"])
-        if user == None:
-            userObj = UserOrm(email=decoded_data["login"], ip=ip, password=decoded_data["password"], mode_id=0)
+        if user == None and decoded_data["password"]:
+            
+            payloads = {
+                'role' : 0,
+                'exp': datetime.today()
+            }
+            token = jwt.encode(payloads, secret_key, algorithm="HS256")
+            userObj = UserOrm(email=decoded_data["login"], ip=ip, password=decoded_data["password"], token=token, mode_id=0)
             await db_handler.add(userObj)
-            return self.return_code["Access"] + "0"
+            self.return_data["status"] = "Access"
+            self.return_data["data"] = token
+            return json.dumps(self.return_data)
         
-        return self.return_code["Denied"] + "1"
+        self.return_data["status"] = "Denied"
+        self.return_data["data"] = 'Invalid username'
+        return json.dumps(self.return_data)
 
     async def login(self, decoded_data):
         db_handler = Database_handler()
         user = await db_handler.get(UserOrm, decoded_data["login"])
-        if user == None:
-            return self.return_code["Denied"] + "2"
 
-        return self.return_code["Access"] + "0"
+        if user == None:
+            self.return_data["status"] = "Denied"
+            self.return_data["data"] = 'Invalid username'
+            return json.dumps(self.return_data)
+        
+        if user.mode_id == 3:
+            self.return_data["status"] = "Denied"
+            self.return_data["data"] = 'Invalid username'
+            return json.dumps(self.return_data)
+        
+        if decoded_data["password"] == user.password:
+            payload = {
+                "role" : user.mode_id,
+                "exp" : datetime.today()
+            }
+            token = jwt.encode(payload, secret_key, algorithm="HS256")
+            self.return_data["status"] = "Access"
+            self.return_data["data"] = token
+            return json.dumps(self.return_data)
+        
+        self.return_data["status"] = "Denied"
+        self.return_data["data"] = "Untrackable error"
+        return json.dumps(self.return_data)
 
     def get(self, decoded_data):
+        token = decoded_data["token"]
+        data = jwt.decode(token, secret_key, algorithms=["HS256"])
+        if data["role"] == 3:
+            self.return_data["status"] = "Denied"
+            self.return_data["data"] = "Banned User"
+            return json.dumps(self.return_data)
         db_handler = Database_handler()
         result = db_handler.select(decoded_data, "Vacancy")
         salary = []
@@ -47,9 +82,9 @@ class ClientModel():
             object.pop('_sa_instance_state', None)
             answer[f"{object['id']}"] = object.copy()
             answer[f"{object['id']}"].pop("id", None)
-        if len(answer) == 0:
-            answer["202"] = "None"
-        return json.dumps(answer)
+        self.return_data["status"] = "Access"
+        self.return_data["data"] = answer
+        return json.dumps(self.return_data)
     
 class СurrencyConverter:
     def __init__(self) -> None:
