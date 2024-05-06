@@ -37,19 +37,18 @@ class Database_handler:
                 session.add(data)
         return True
             
-    def select(self, data, mode):
+    def select(self, data, orm: Base):
         with self.sync_session_factory() as session:
             with session.begin(): 
-                if mode == "Vacancy":
-                    query_builder = DBQueryBuilder(session, VacancyOrm)
+                query_builder = DBQueryBuilder(session, orm)
+                if orm == VacancyOrm:
                     query_builder.add_filter(ProfessionNameFilter(data["vacancy_name"]))
                     query_builder.add_filter(RequirementFilter(data["vacancy_name"]))
                     query_builder.add_filter(ProffessionRoleFilter(data["vacancy_name"]))
                     query_builder.add_filter(RegionFilter(session, data["area"]))
                     query_builder.add_filter(ExperienceFilter(data["exp"]))
-                elif mode == "Salary":
-                    query_builder = DBQueryBuilder(session, SalaryOrm)
-                    query_builder.add_filter(IdFilter(data.id))
+                elif orm == SalaryOrm:
+                    query_builder.add_filter(IdFilter(data.id, SalaryOrm))
                 
                 query = query_builder.build()
                 

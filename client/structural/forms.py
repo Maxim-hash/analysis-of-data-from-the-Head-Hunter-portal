@@ -1,14 +1,122 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter.ttk import Treeview
 from structural.src.request_builder import *
 from structural.src.graphs import *
 from structural.src.request_context import *
 from creational.singleton import Singleton
+from structural.config import secret_key
+import jwt
 
 class MainForm(Frame):
-    def __init__(self, master, token):
+    def __init__(self, master, token, search_func):
+        super().__init__(master=master)
+        self.search_func = search_func
+        self.token = token
+        self.user_info = self.decode_token(token)
+        #self.admin_panel = None  # Инициализируем панель как None, пока она не открыта
+        self.setup_ui()
+
+    def decode_token(self, token):
+        # Декодирование токена пользователя
+        decoded = jwt.decode(token, secret_key, algorithms=["HS256"])
+        return decoded
+
+    def setup_ui(self):
+        # Создаем PanedWindow с вертикальным разделением
+        self.paned_window = PanedWindow(self, orient=HORIZONTAL)
+        self.paned_window.pack(fill=BOTH, expand=True)
+
+        # Создаем фрейм для управления (20%)
+        self.control_frame = Frame(self.paned_window, width=200, height=600, bg='lightgray')
+        self.control_frame.pack(fill=BOTH, expand=True)
+        self.paned_window.add(self.control_frame, width=200)  # Устанавливаем ширину фрейма
+
+        # Создаем фрейм для отображения контента (80%)
+        self.display_frame = Frame(self.paned_window, bg='white')
+        self.display_frame.pack(fill=BOTH, expand=True)
+        self.paned_window.add(self.display_frame)  # Оставшееся пространство отдается этому фрейму
+
+        self.admin_frame = AdminFrame(self.display_frame, self.search_func, self.token)
+        # Пример добавления элементов управления
+        Label(self.control_frame, text="Панель управления", bg='lightgray').pack(pady=10)
+        self.user_button = Button(self.control_frame, text="Пользовательская панель", state="disabled", command=self.show_initial_content)
+        self.user_button.pack(pady=5, fill="x")
+
+        # Добавление кнопки панели администратора
+        if self.user_info.get('role') == 2:
+            self.admin_button = Button(self.control_frame, text="Панель администратора", command=self.show_administator_content)
+            self.admin_button.pack(pady=10, fill="x")
+        Label(self.display_frame, text="Пользовательская панель", bg='white').pack(side=TOP)
+
+    def clear_display_frame(self):
+        for widget in self.display_frame.winfo_children():
+            widget.destroy()
+
+    def show_initial_content(self):
+        self.clear_display_frame()
+        Label(self.display_frame, text="Пользовательская панель", bg='white').pack(side=TOP)
+        self.user_button.config(state=DISABLED)
+        self.admin_button.config(state=NORMAL)
+
+    def show_administator_content(self):
+        self.clear_display_frame()
+        self.admin_frame.update()
+        self.user_button.config(state=NORMAL)
+        self.admin_button.config(state=DISABLED)
+
+class AdminFrame(Frame):
+    def __init__(self, master, search, token):
         super().__init__(master=master)
         self.token = token
+        self.search = search
+
+    def makeUI(self, data):
+        Label(self.master, text="Панель Администратора", bg='white').pack()
+        container = Frame(self.master)
+        container.pack(expand=False, fill="both")
+        #  Создание виджета Treeview
+        tree = Treeview(container, columns=("ID", "Login", "Action", "Status", "Time"), show="headings")
+
+        # Установка заголовков столбцов
+        tree.heading("ID", text="ID")
+        tree.heading("Login", text="Login")
+        tree.heading("Action", text="Action")
+        tree.heading("Status", text="Status")
+        tree.heading("Time", text="Time")
+
+        # Установка ширины столбцов
+        tree.column("ID", width=15)
+        tree.column("Login", width=30)
+        tree.column("Action", width=500)
+        tree.column("Status", width=20)
+        tree.column("Time", width=40)
+
+        # Добавление данных в таблицу
+        for i in data:
+            tree_data = [i]
+            tree_data.extend(list(data[i].values()))
+            tree_data[1], tree_data[3] = tree_data[3], tree_data[1]
+            tree_data[2], tree_data[4] = tree_data[4], tree_data[2]
+
+            tree.insert("", "end", values=tree_data)
+       
+        # Создание вертикальной прокрутки
+        scrollbar_vertical = Scrollbar(container, orient="vertical", command=tree.yview)
+        tree.configure(yscrollcommand=scrollbar_vertical.set)
+        scrollbar_vertical.pack(side="right", fill="y")
+
+        # Создание горизонтальной прокрутки
+        scrollbar_horizontal = Scrollbar(container, orient="horizontal", command=tree.xview)
+        tree.configure(xscrollcommand=scrollbar_horizontal.set)
+        scrollbar_horizontal.pack(side="bottom", fill="x")
+
+        # Размещение виджета Treeview в окне приложения
+        tree.pack(side="left", expand=True, fill="both")
+
+    def update(self):
+        data = self.search(self.token, journal="")
+        self.makeUI(data.data)
 
 class SubForms(Frame):
     def __init__(self, master, data, callback):
@@ -114,4 +222,4 @@ class SearchForm(Frame, Singleton):
         vacancy_name = self.entry_vacancy_name.get()
         area = self.entry_area.get()
         exp = self.selected_exp.get()
-        self.create_new_form(self.on_search(self.token, vacancy_name, area, exp), vacancy_name)
+        self.create_new_form(self.on_search(token=self.token, vacancy_name=vacancy_name, area=area, exp=exp), vacancy_name)

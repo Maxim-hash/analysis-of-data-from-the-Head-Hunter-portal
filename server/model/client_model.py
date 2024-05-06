@@ -7,7 +7,7 @@ from datetime import datetime
 class ClientModel():
     def __init__(self) -> None:
         self.return_data = {
-            "statues" : None,
+            "status" : None,
             "data" : None
         }
         
@@ -20,6 +20,7 @@ class ClientModel():
         if user == None and decoded_data["password"]:
             
             payloads = {
+                'login' : decoded_data["login"],
                 'role' : 0,
                 'exp': datetime.today()
             }
@@ -28,11 +29,11 @@ class ClientModel():
             await db_handler.add(userObj)
             self.return_data["status"] = "Access"
             self.return_data["data"] = token
-            return json.dumps(self.return_data)
+            return self.return_data
         
         self.return_data["status"] = "Denied"
         self.return_data["data"] = 'Invalid username'
-        return json.dumps(self.return_data)
+        return self.return_data
 
     async def login(self, decoded_data):
         db_handler = Database_handler()
@@ -41,26 +42,27 @@ class ClientModel():
         if user == None:
             self.return_data["status"] = "Denied"
             self.return_data["data"] = 'Invalid username'
-            return json.dumps(self.return_data)
+            return self.return_data
         
         if user.mode_id == 3:
             self.return_data["status"] = "Denied"
-            self.return_data["data"] = 'Invalid username'
-            return json.dumps(self.return_data)
+            self.return_data["data"] = 'Banned user'
+            return self.return_data
         
         if decoded_data["password"] == user.password:
             payload = {
+                'login' : user.email,
                 "role" : user.mode_id,
                 "exp" : datetime.today()
             }
             token = jwt.encode(payload, secret_key, algorithm="HS256")
             self.return_data["status"] = "Access"
             self.return_data["data"] = token
-            return json.dumps(self.return_data)
+            return self.return_data
         
         self.return_data["status"] = "Denied"
-        self.return_data["data"] = "Untrackable error"
-        return json.dumps(self.return_data)
+        self.return_data["data"] = "Invalid password"
+        return self.return_data
 
     def get(self, decoded_data):
         token = decoded_data["token"]
@@ -68,12 +70,29 @@ class ClientModel():
         if data["role"] == 3:
             self.return_data["status"] = "Denied"
             self.return_data["data"] = "Banned User"
-            return json.dumps(self.return_data)
+            return self.return_data
         db_handler = Database_handler()
-        result = db_handler.select(decoded_data, "Vacancy")
+        if "journal" in decoded_data:
+            result = db_handler.select(decoded_data, JournalOrm)
+            data = {}
+            for i in result:
+                obj = {**(i.__dict__)}
+                obj.pop('_sa_instance_state', None)
+                data[obj['id']] = obj.copy()
+                data[obj['id']]["time"] = data[obj['id']]["time"].isoformat() 
+                data[obj['id']].pop("id", None)
+            self.return_data["status"] = "Access"
+            self.return_data["data"] = data
+            return self.return_data
+        if "user" in decoded_data:
+            result = db_handler.select(decoded_data, UserOrm)
+            self.return_data["status"] = "Access"
+            self.return_data["data"] = result
+            return self.return_data
+        result = db_handler.select(decoded_data, VacancyOrm)
         salary = []
         for item in result:
-            salary.extend(db_handler.select(item, "Salary"))
+            salary.extend(db_handler.select(item, SalaryOrm))
         
         result_salary = get_salary(salary)
         answer = {}
@@ -84,7 +103,13 @@ class ClientModel():
             answer[f"{object['id']}"].pop("id", None)
         self.return_data["status"] = "Access"
         self.return_data["data"] = answer
-        return json.dumps(self.return_data)
+        return self.return_data
+    
+    async def logging(self, token, action, status):
+        user_token = jwt.decode(token, secret_key, algorithms=["HS256"])
+        db_handler = Database_handler()
+        journal_entry = JournalOrm(token=user_token["login"], action=action, status=status, time= datetime.today())
+        await db_handler.add(journal_entry)
     
 class СurrencyConverter:
     def __init__(self) -> None:

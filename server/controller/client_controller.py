@@ -1,10 +1,15 @@
 import asyncio
+import json
 from controller.controller import controller
 from model.client_model import ClientModel 
 
 class client_controller(controller):
     @staticmethod
     def handle(ip, data: dict):
+        converter = {
+            "Access" : True,
+            "Denied" : False
+        }
         model = ClientModel()
         needed_data = {key : value for key, value in data.items() if key != "action"}
         if data['action'] == "auth": 
@@ -15,5 +20,8 @@ class client_controller(controller):
             result = model.get(needed_data)
         else:
             result = "Incorrect Data"
-        
-        return result
+        if "token" in data:
+            logging_data = {key : value for key, value in data.items() if key != "token"}
+            asyncio.run(model.logging(data["token"], str(logging_data), converter[result['status']]))
+
+        return json.dumps(result)

@@ -1,4 +1,3 @@
-import base64
 import json
 
 class RequestTemplate:
@@ -21,8 +20,16 @@ class AuthRequestTemplate(RequestTemplate):
         super().__init__("auth", login=login, password=password)
     
 class GetRequestTemplate(RequestTemplate):
-    def __init__(self, token, vacancy_name = "%", area = "%", exp = "%") -> None:
-        super().__init__("get", vacancy_name=vacancy_name, area=area, exp=exp, token=token)
+    def __init__(self, token, **kwargs) -> None:
+        super().__init__("get", token=token, **kwargs)
+
+class UpdateDatabaseRequestTemplate(RequestTemplate):
+    def __init__(self, token) -> None:
+        super().__init__("update", token=token)
+
+class BanUserRequestTemplate(RequestTemplate):
+    def __init__(self, token, **kwargs) -> None:
+        super().__init__("ban", token=token **kwargs)
     
 class JSONRequestBuilder:
     def __init__(self, templateRequest: RequestTemplate):

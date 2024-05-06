@@ -2,7 +2,7 @@ import socket
 from tkinter import *
 from tkinter import ttk
 from creational.singleton import Singleton
-from client.structural.forms import MainForm, SubForms, SearchForm
+from structural.forms import MainForm, SubForms, SearchForm
 from structural.src.search import search
 
 class MainWindow(Tk, Singleton):
@@ -16,7 +16,7 @@ class MainWindow(Tk, Singleton):
     def makeUI(self, token):
         self.notebook = ttk.Notebook()
         self.notebook.pack(expand=True, fill=BOTH)
-        self.settingFrame = MainForm(self.notebook, token)
+        self.settingFrame = MainForm(self.notebook, token, search)
         self.main_frame = SearchForm(self.notebook, search, self.create_new_form, token)
 
         self.settingFrame.pack(expand=True, fill=BOTH)

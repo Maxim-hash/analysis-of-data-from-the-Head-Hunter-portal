@@ -1,7 +1,7 @@
 from typing import List, Type
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import Session
-from model.src.Orms import VacancyOrm, AreaOrm, SalaryOrm
+from model.src.Orms import VacancyOrm, AreaOrm, SalaryOrm, Base
 
 class FilterInterface:
     def apply(self) -> None:
@@ -24,9 +24,6 @@ class DBQueryBuilder:
     def build(self):
         or_filters = []
         and_filters = []
-
-        #filters = [filter.apply() for filter in self.filters]
-        #filters = [item for item in filters if item is not None]
         
         for filter in self.filters:
             if filter.should_use_or_operator():
@@ -123,11 +120,12 @@ class ExperienceFilter(FilterInterface):
         return None
     
 class IdFilter(FilterInterface):
-    def __init__(self, id: int):
+    def __init__(self, id: int, orm: Base):
         self.id = id
+        self.orm = orm
 
     def apply(self):
         if self.id is not None:
-            return SalaryOrm.id == self.id
+            return self.orm.id == self.id
         return None
 

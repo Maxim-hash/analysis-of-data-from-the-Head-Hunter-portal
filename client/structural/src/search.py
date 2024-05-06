@@ -4,12 +4,12 @@ from structural.src.request_builder import *
 from structural.src.graphs import *
 from structural.src.request_context import *
 
-def search(token, vacancy_name, area, exp):
+def search(token, **kwargs):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     
     try:
         sock.connect((config.host_ip, config.port))
-        request_builder = JSONRequestBuilder(GetRequestTemplate(token, vacancy_name, area, exp))
+        request_builder = JSONRequestBuilder(GetRequestTemplate(token, **kwargs))
        
         request = request_builder.build()
         message = request.encode(config.encoding)
