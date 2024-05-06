@@ -1,7 +1,7 @@
 from typing import List, Type
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import Session
-from model.src.Orms import VacancyOrm, AreaOrm, SalaryOrm, Base
+from model.src.Orms import VacancyOrm, AreaOrm, SalaryOrm, Base, JournalOrm
 
 class FilterInterface:
     def apply(self) -> None:
@@ -57,6 +57,15 @@ class ProfessionNameFilter(FilterInterface):
     
     def should_use_or_operator(self) -> bool:
         return True
+    
+class LoginFilter(FilterInterface):
+    def __init__(self, login : str) -> None:
+        self.login = login
+
+    def apply(self) -> None:
+        if self.login:
+            return JournalOrm.token.like(self.login)
+        return None
     
 class RequirementFilter(FilterInterface):
     def __init__(self, requirement) -> None:

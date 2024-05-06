@@ -49,7 +49,8 @@ class Database_handler:
                     query_builder.add_filter(ExperienceFilter(data["exp"]))
                 elif orm == SalaryOrm:
                     query_builder.add_filter(IdFilter(data.id, SalaryOrm))
-                
+                elif orm == JournalOrm:
+                    query_builder.add_filter(LoginFilter(data["journal"]))
                 query = query_builder.build()
                 
                 result = query.all()
