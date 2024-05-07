@@ -7,6 +7,7 @@ from structural.src.request_context import *
 from creational.singleton import Singleton
 from structural.config import secret_key
 import jwt
+import uuid
 
 class MainForm(Frame):
     def __init__(self, master, token, search_func):
@@ -131,6 +132,12 @@ class AdminFrame(Frame):
 
     def makeUI(self, data):
         Label(self.master, text="Панель Администратора", bg='white').pack()
+        self.selected_user_frame = Frame(self.master, bg='white')
+        self.selected_user_frame.pack(anchor=NW)
+        self.selected_user = Label(self.selected_user_frame, bg='white')
+        self.selected_user.grid(row=0, column=0)
+        self.selected_user_button = Button(self.selected_user_frame, text="Заблокировать", command=self.ban_user)
+
         container = Frame(self.master)
         container.pack(expand=False, fill="both")
         #  Создание виджета Treeview
@@ -169,12 +176,26 @@ class AdminFrame(Frame):
         tree.configure(xscrollcommand=scrollbar_horizontal.set)
         scrollbar_horizontal.pack(side="bottom", fill="x")
 
+        def item_selected(event):
+            selected_people = ""
+            for selected_item in tree.selection():
+                item = tree.item(selected_item)
+                person = item["values"][1]
+                selected_people = f"{selected_people}{person}\n"
+            self.selected_user["text"]=selected_people
+            self.selected_user_button.grid(row=0, column=1)
+ 
+        tree.bind("<<TreeviewSelect>>", item_selected)
+
         # Размещение виджета Treeview в окне приложения
         tree.pack(side="left", expand=True, fill="both")
 
     def update(self):
         data = self.search(self.token, journal="%")
         self.makeUI(data.data)
+
+    def ban_user(self):
+        pass
 
 class SubForms(Frame):
     def __init__(self, master, data, callback):
@@ -194,9 +215,17 @@ class SubForms(Frame):
 
         self.count_vacancy = Label(self.scrollable_frame, text='')
         self.close_button = ttk.Button(self.scrollable_frame, text='Закрыть', command=lambda: self.close_tab(self, callback))
+        self.download_raw_data_button = ttk.Button(self.scrollable_frame, text="Выгрузить данные", command= lambda : self.download_raw_data(data))
         self.close_button.pack(anchor=NE)
+        self.download_raw_data_button.pack(anchor=NE)
     
         self.show_stat(data)
+
+    def download_raw_data(self, data: RequestContext):
+        filename = f"{uuid.uuid4()}.json"
+
+        with open(filename, "w", encoding='utf-8') as json_file:
+            json.dump(data.data, json_file, ensure_ascii=False, indent=4)
 
     def _on_mousewheel(self, event):
         self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
