@@ -15,7 +15,7 @@ class MainForm(Frame):
         self.search_func = search_func
         self.token = token
         self.user_info = self.decode_token(token)
-        #self.admin_panel = None  # Инициализируем панель как None, пока она не открыта
+
         self.setup_ui()
 
     def decode_token(self, token):
@@ -40,6 +40,7 @@ class MainForm(Frame):
 
         self.admin_frame = AdminFrame(self.display_frame, self.search_func, self.token)
         self.user_frame = UserFrame(self.display_frame, self.search_func, self.token)
+
         # Пример добавления элементов управления
         Label(self.control_frame, text="Панель управления", bg='lightgray').pack(pady=10)
         self.user_button = Button(self.control_frame, text="Пользовательская панель", state="disabled", command=self.show_initial_content)
