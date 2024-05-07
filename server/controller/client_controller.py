@@ -18,6 +18,8 @@ class client_controller(controller):
             result = asyncio.run(model.login(needed_data))
         elif data['action'] == "get":
             result = model.get(needed_data)
+        elif data["action"] == "update":
+            result = model.update(needed_data)
         else:
             result = "Incorrect Data"
         if "token" in data:

@@ -1,6 +1,8 @@
+import asyncio
 import jwt
 import json
 from model.src.database_handler import *
+from controller.api_controller import *
 from config import secret_key
 from datetime import datetime
 
@@ -104,6 +106,36 @@ class ClientModel():
         self.return_data["status"] = "Access"
         self.return_data["data"] = answer
         return self.return_data
+    
+    def update(self, decoded_data):
+        token = decoded_data["token"]
+        data = jwt.decode(token, secret_key, algorithms=["HS256"])
+        if data["role"] == 3:
+            self.return_data["status"] = "Denied"
+            self.return_data["data"] = "Banned User"
+            return self.return_data
+        db_handler = Database_handler()
+        if "new_password" in decoded_data:
+            db_handler.update_password(decoded_data["username"], decoded_data["new_password"])
+            self.return_data["status"] = "Access"
+            self.return_data["data"] = "Password has been changed"
+
+        elif "new_status" in decoded_data:
+            user = asyncio.run(db_handler.get(UserOrm, decoded_data["username"]))
+            if user.mode_id == 2:
+                self.return_data["status"] = "Denied"
+                self.return_data["data"] = "This user admin"
+
+            db_handler.update_user_status(decoded_data["username"], decoded_data["new_status"])
+            self.return_data["status"] = "Access"
+            self.return_data["data"] = "Status has been changed"
+
+        elif "database" in decoded_data:
+            asyncio.run(api_controller.update_database())
+            self.return_data["status"] = "Access"
+            self.return_data["data"] = "Database has been updated"
+        return self.return_data
+
     
     async def logging(self, token, action, status):
         user_token = jwt.decode(token, secret_key, algorithms=["HS256"])

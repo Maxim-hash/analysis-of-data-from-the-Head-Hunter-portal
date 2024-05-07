@@ -6,6 +6,7 @@ from structural.src.graphs import *
 from structural.src.request_context import *
 from creational.singleton import Singleton
 from structural.config import secret_key
+from tkinter import messagebox
 import jwt
 import uuid
 
@@ -40,21 +41,30 @@ class MainForm(Frame):
 
         self.admin_frame = AdminFrame(self.display_frame, self.search_func, self.token)
         self.user_frame = UserFrame(self.display_frame, self.search_func, self.token)
+        self.change_password_frame = ChangePasswordFrame(self.display_frame, self.search_func, self.token)
 
         # Пример добавления элементов управления
         Label(self.control_frame, text="Панель управления", bg='lightgray').pack(pady=10)
         self.user_button = Button(self.control_frame, text="Пользовательская панель", state="disabled", command=self.show_initial_content)
         self.user_button.pack(pady=5, fill="x")
-
+        self.change_password_button = Button(self.control_frame, text="Сменить пароль", command=self.change_password)
+        
         # Добавление кнопки панели администратора
         if self.user_info.get('role') == 2:
             self.admin_button = Button(self.control_frame, text="Панель администратора", command=self.show_administator_content)
             self.admin_button.pack(pady=10, fill="x")
+
+        self.change_password_button.pack(pady=5, fill="x")
+
         self.user_frame.update()
 
     def clear_display_frame(self):
         for widget in self.display_frame.winfo_children():
             widget.destroy()
+
+    def change_password(self):
+        self.clear_display_frame()
+        self.change_password_frame.update()
 
     def show_initial_content(self):
         self.clear_display_frame()
@@ -67,6 +77,39 @@ class MainForm(Frame):
         self.user_button.config(state=NORMAL)
         self.admin_button.config(state=DISABLED)
         self.admin_frame.update()
+
+class ChangePasswordFrame(Frame):
+    def __init__(self, master, search, token):
+        super().__init__(master=master)
+        self.token = token
+        self.params = jwt.decode(token, secret_key, algorithms=["HS256"])
+        self.search = search
+
+    def makeUI(self):
+        Label(self.master, text="Смена пароля").pack(side=TOP)
+        Label(self.master, text="Введите новый пароль").pack(anchor=NW)
+        self.entry_password1 = ttk.Entry(self.master, width=40, show="*")
+        self.entry_password1.pack(padx=5, pady=5)
+        Label(self.master, text="Подтвердите пароль").pack(anchor=NW)
+        self.entry_password2 = ttk.Entry(self.master, width=40, show="*")
+        self.entry_password2.pack(padx=5, pady=5)
+
+        self.change_password_button = Button(self.master, text="Сменить пароль", command=self.change_password)
+        self.change_password_button.pack()
+
+    def change_password(self):
+        password = self.entry_password1.get()
+        password2 = self.entry_password2.get()
+
+        if password != password2:
+            messagebox.showerror("Ошибка", "Пароли не совпадают")
+            return 
+        
+        data = self.search(self.token, "update", username=self.params["login"], new_password=password)
+        messagebox.showinfo("Успех", data.data)
+
+    def update(self):
+        self.makeUI()
 
 class UserFrame(Frame):
     def __init__(self, master, search, token):
@@ -101,10 +144,9 @@ class UserFrame(Frame):
 
         # Добавление данных в таблицу
         for i in data:
-            tree_data = [i]
-            tree_data.extend(list(data[i].values()))
-            tree_data[1], tree_data[3] = tree_data[3], tree_data[1]
-            tree_data[2], tree_data[4] = tree_data[4], tree_data[2]
+            tree_data = [i, data[i]["token"], data[i]["action"], data[i]["status"], data[i]["time"]]
+            #tree_data[1], tree_data[3] = tree_data[3], tree_data[1]
+            #tree_data[2], tree_data[4] = tree_data[4], tree_data[2]
 
             tree.insert("", "end", values=tree_data)
        
@@ -138,10 +180,16 @@ class AdminFrame(Frame):
         self.selected_user = Label(self.selected_user_frame, bg='white')
         self.selected_user.grid(row=0, column=0)
         self.selected_user_button = Button(self.selected_user_frame, text="Заблокировать", command=self.ban_user)
+        Button(self.master, text="Заблокировать", command=self.update_database)
 
         container = Frame(self.master)
         container.pack(expand=False, fill="both")
-        #  Создание виджета Treeview
+        self.show_journal(container, data)
+
+    def update_database(self):
+        self.search(self.token, "update", database="")
+
+    def show_journal(self, container, data):
         tree = Treeview(container, columns=("ID", "Login", "Action", "Status", "Time"), show="headings")
 
         # Установка заголовков столбцов
@@ -160,10 +208,7 @@ class AdminFrame(Frame):
 
         # Добавление данных в таблицу
         for i in data:
-            tree_data = [i]
-            tree_data.extend(list(data[i].values()))
-            tree_data[1], tree_data[3] = tree_data[3], tree_data[1]
-            tree_data[2], tree_data[4] = tree_data[4], tree_data[2]
+            tree_data = [i, data[i]["token"], data[i]["action"], data[i]["status"], data[i]["time"]]
 
             tree.insert("", "end", values=tree_data)
        
@@ -182,7 +227,7 @@ class AdminFrame(Frame):
             for selected_item in tree.selection():
                 item = tree.item(selected_item)
                 person = item["values"][1]
-                selected_people = f"{selected_people}{person}\n"
+                selected_people = f"{selected_people}{person}"
             self.selected_user["text"]=selected_people
             self.selected_user_button.grid(row=0, column=1)
  
@@ -191,12 +236,15 @@ class AdminFrame(Frame):
         # Размещение виджета Treeview в окне приложения
         tree.pack(side="left", expand=True, fill="both")
 
+    def show_banned_user(self, container):
+        pass
     def update(self):
         data = self.search(self.token, journal="%")
         self.makeUI(data.data)
 
     def ban_user(self):
-        pass
+        data = self.search(self.token, "update", username = self.selected_user["text"], new_status = 3)
+        messagebox.showinfo("Успех", data.data)
 
 class SubForms(Frame):
     def __init__(self, master, data, callback):

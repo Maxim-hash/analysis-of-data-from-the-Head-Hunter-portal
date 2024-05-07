@@ -4,13 +4,15 @@ from structural.src.request_builder import *
 from structural.src.graphs import *
 from structural.src.request_context import *
 
-def search(token, **kwargs):
+def search(token, mode = "", **kwargs):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     
     try:
         sock.connect((config.host_ip, config.port))
-        request_builder = JSONRequestBuilder(GetRequestTemplate(token, **kwargs))
-       
+        if mode == "":
+            request_builder = JSONRequestBuilder(GetRequestTemplate(token, **kwargs))
+        else:
+            request_builder = JSONRequestBuilder(UpdateRequestTemplate(token, **kwargs))
         request = request_builder.build()
         message = request.encode(config.encoding)
         sock.send(message)

@@ -23,13 +23,9 @@ class GetRequestTemplate(RequestTemplate):
     def __init__(self, token, **kwargs) -> None:
         super().__init__("get", token=token, **kwargs)
 
-class UpdateDatabaseRequestTemplate(RequestTemplate):
-    def __init__(self, token) -> None:
-        super().__init__("update", token=token)
-
-class BanUserRequestTemplate(RequestTemplate):
+class UpdateRequestTemplate(RequestTemplate):
     def __init__(self, token, **kwargs) -> None:
-        super().__init__("ban", token=token **kwargs)
+        super().__init__("update", token=token, **kwargs)
     
 class JSONRequestBuilder:
     def __init__(self, templateRequest: RequestTemplate):

@@ -1,7 +1,7 @@
 from typing import List, Type
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import Session
-from model.src.Orms import VacancyOrm, AreaOrm, SalaryOrm, Base, JournalOrm
+from model.src.Orms import VacancyOrm, AreaOrm, SalaryOrm, Base, JournalOrm, UserOrm
 
 class FilterInterface:
     def apply(self) -> None:
@@ -126,6 +126,15 @@ class ExperienceFilter(FilterInterface):
     def apply(self):
         if self.experience:
             return VacancyOrm.exp.like(f"%{self.experience}%")
+        return None
+    
+class ModeFilter(FilterInterface):
+    def __init__(self, mode_id: int):
+        self.mode_id = mode_id
+
+    def apply(self):
+        if self.mode_id:
+            return UserOrm.mode_id == self.mode_id
         return None
     
 class IdFilter(FilterInterface):

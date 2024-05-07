@@ -51,6 +51,8 @@ class Database_handler:
                     query_builder.add_filter(IdFilter(data.id, SalaryOrm))
                 elif orm == JournalOrm:
                     query_builder.add_filter(LoginFilter(data["journal"]))
+                elif orm == UserOrm:
+                    query_builder.add_filter(LoginFilter(data["status"]))
                 query = query_builder.build()
                 
                 result = query.all()
@@ -69,8 +71,17 @@ class Database_handler:
 
         return True
 
-    def update_table(data):
-        pass
+    def update_password(self, username, new_password):
+        with self.sync_session_factory() as session:
+            user = session.get(UserOrm, username)
+            user.password = new_password
+            session.commit()
+
+    def update_user_status(self, username, new_status):
+        with self.sync_session_factory() as session:
+            user = session.get(UserOrm, username)
+            user.mode_id = new_status
+            session.commit()
 
     async def drop_tables(self):
         async with self.async_engine.begin() as conn:
