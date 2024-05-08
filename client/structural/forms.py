@@ -7,6 +7,10 @@ from structural.src.request_context import *
 from creational.singleton import Singleton
 from structural.config import secret_key
 from tkinter import messagebox
+from spacy.matcher import Matcher
+from scipy import stats
+import spacy
+from collections import Counter
 import jwt
 import uuid
 
@@ -145,8 +149,6 @@ class UserFrame(Frame):
         # Добавление данных в таблицу
         for i in data:
             tree_data = [i, data[i]["token"], data[i]["action"], data[i]["status"], data[i]["time"]]
-            #tree_data[1], tree_data[3] = tree_data[3], tree_data[1]
-            #tree_data[2], tree_data[4] = tree_data[4], tree_data[2]
 
             tree.insert("", "end", values=tree_data)
        
@@ -175,21 +177,78 @@ class AdminFrame(Frame):
 
     def makeUI(self, data):
         Label(self.master, text="Панель Администратора", bg='white').pack()
-        self.selected_user_frame = Frame(self.master, bg='white')
-        self.selected_user_frame.pack(anchor=NW)
-        self.selected_user = Label(self.selected_user_frame, bg='white')
-        self.selected_user.grid(row=0, column=0)
-        self.selected_user_button = Button(self.selected_user_frame, text="Заблокировать", command=self.ban_user)
-        Button(self.master, text="Заблокировать", command=self.update_database)
+        
+        Button(self.master, text="Обновить базу данных", command=self.update_database).pack(anchor=NE)
 
-        container = Frame(self.master)
-        container.pack(expand=False, fill="both")
-        self.show_journal(container, data)
+        journal_container = Frame(self.master, bg='white')
+        journal_container.pack(expand=False, fill="both")
+        self.selected_user = Label(journal_container, bg='white')
+        self.selected_user_button = Button(journal_container, text="Заблокировать", command=self.ban_user)
+        self.show_journal(journal_container, data)
 
-    def update_database(self):
+        ban_list_container = Frame(self.master, bg='white')
+        ban_list_container.pack(expand=False, fill="both")
+        self.selected_banned_user = Label(ban_list_container, bg='white')
+        self.selected_banned_user_button = Button(ban_list_container, text="Разблокировать", command=self.unban_user)
+        self.show_banned_users(ban_list_container)
+
+    def unban_user(self):
+        data = self.search(self.token, "update", username = self.selected_banned_user["text"], new_status = 0)
+        messagebox.showinfo("Успех", data.data)
+
+    def update_database(self,):
         self.search(self.token, "update", database="")
 
+    def show_banned_users(self, container):
+        Label(container, text="Список заблокированных пользователей", bg='white').pack()
+        data = self.search(self.token, user="", status=3).data
+
+        tree = Treeview(container, columns=("Login", "Token", "Status"), show="headings")
+
+        # Установка заголовков столбцов
+        tree.heading("Login", text="Login")
+        tree.heading("Token", text="Token")
+        tree.heading("Status", text="Status")
+
+        # Установка ширины столбцов
+        tree.column("Login", width=30)
+        tree.column("Token", width=500)
+        tree.column("Status", width=15)
+
+        # Добавление данных в таблицу
+        for i in data:
+            tree_data = [i, data[i]["token"], data[i]["mode_id"]]
+
+            tree.insert("", "end", values=tree_data)
+       
+        # Создание вертикальной прокрутки
+        scrollbar_vertical = Scrollbar(container, orient="vertical", command=tree.yview)
+        tree.configure(yscrollcommand=scrollbar_vertical.set)
+        scrollbar_vertical.pack(side="right", fill="y")
+
+        # Создание горизонтальной прокрутки
+        scrollbar_horizontal = Scrollbar(container, orient="horizontal", command=tree.xview)
+        tree.configure(xscrollcommand=scrollbar_horizontal.set)
+        scrollbar_horizontal.pack(side="bottom", fill="x")
+
+        def item_selected(event):
+            selected_people = ""
+            for selected_item in tree.selection():
+                item = tree.item(selected_item)
+                person = item["values"][0]
+                selected_people = f"{selected_people}{person}"
+            self.selected_banned_user["text"]=selected_people
+            self.selected_banned_user.pack()
+            self.selected_banned_user_button.pack()
+ 
+        tree.bind("<<TreeviewSelect>>", item_selected)
+
+        # Размещение виджета Treeview в окне приложения
+        tree.pack(side="left", expand=True, fill="both")
+
+
     def show_journal(self, container, data):
+        Label(container, text="Журнал действий пользователей", bg='white').pack()
         tree = Treeview(container, columns=("ID", "Login", "Action", "Status", "Time"), show="headings")
 
         # Установка заголовков столбцов
@@ -229,15 +288,14 @@ class AdminFrame(Frame):
                 person = item["values"][1]
                 selected_people = f"{selected_people}{person}"
             self.selected_user["text"]=selected_people
-            self.selected_user_button.grid(row=0, column=1)
+            self.selected_user.pack()
+            self.selected_user_button.pack()
  
         tree.bind("<<TreeviewSelect>>", item_selected)
 
         # Размещение виджета Treeview в окне приложения
         tree.pack(side="left", expand=True, fill="both")
 
-    def show_banned_user(self, container):
-        pass
     def update(self):
         data = self.search(self.token, journal="%")
         self.makeUI(data.data)
@@ -290,13 +348,62 @@ class SubForms(Frame):
         base_histogram1 = BaseHistogram(request)
         base_histogram1.draw(self.scrollable_frame)
         uniq_exp = data.getUniqMeta()
-        exp_histograms = []
+        tree = Treeview(self.scrollable_frame, columns=("Опыт работы", "Среднее зарплат", "Медиана Зарплат", "Мода зарплат", "Количество вакансий"), show="headings")
+
+        # Установка заголовков столбцов
+        tree.heading("Опыт работы", text="Опыт работы")
+        tree.heading("Среднее зарплат", text="Среднее зарплат")
+        tree.heading("Медиана Зарплат", text="Медиана Зарплат")
+        tree.heading("Мода зарплат", text="Мода зарплат")
+        tree.heading("Количество вакансий", text="Количество вакансий")
+
+        # Установка ширины столбцов
+        tree.column("Опыт работы", width=60)
+        tree.column("Среднее зарплат", width=100)
+        tree.column("Медиана Зарплат", width=100)
+        tree.column("Мода зарплат", width=100)
+        tree.column("Количество вакансий", width=100)
+
+        # Добавление данных в таблицу
         for i in uniq_exp:
-            exp_histograms.append(BaseHistogram(request))
-            exp_histograms[-1].set_data_frame(data.filterDataByExp(i))
-            exp_histograms[-1].draw(self.scrollable_frame)        
-        #base_histogram2 = BaseHistogram(request)
-        #base_histogram2.draw(self.scrollable_frame)
+            filtered_by_exp_dataframe = data.filterDataByExp(i)
+            salaries = [int(j) for j in filtered_by_exp_dataframe["salary"] if pd.notnull(j)] 
+            q1 = np.quantile(salaries, 0.25)  # 25% квантиль
+            q3 = np.quantile(salaries, 0.75)  # 75% квантиль
+
+            iqr = q3 - q1  # Межквартильный размах
+
+            # Определение границ для отсечения выбросов
+            lower_bound = q1 - 1.5 * iqr
+            upper_bound = q3 + 1.5 * iqr
+
+            # Фильтрация выбросов
+            filtered_salaries = [x for x in salaries if lower_bound <= x <= upper_bound]
+            mean_salary = np.mean(filtered_salaries)
+            median_salary = np.median(filtered_salaries)
+            mode = stats.mode(filtered_salaries)
+
+            tree_data = [i, mean_salary, median_salary, mode.mode, len(filtered_salaries)]
+            tree.insert("", "end", values=tree_data)
+       
+        tree.pack(side="left", expand=True, fill="both")
+
+        nlp = spacy.load("ru_core_news_sm")
+
+        texts = [j for j in data.get_dataframe()["requirement"] if pd.notnull(j)]
+        all_skills = []
+        text = "".join(texts)
+
+        doc = nlp(text)
+
+        # Извлечение навыков
+        skills = [token.text for token in doc if token.pos_ == "PROPN" or (token.pos_ == "NOUN" and token.dep_ in ["dobj", "pobj", "nsubj"])]
+
+        # Подсчет и вывод статистики навыков
+        skills_counter = Counter(skills)
+        print("Найденные навыки и количество их упоминаний:")
+        for skill, count in skills_counter.most_common():
+            print(f"{skill}: {count}")
 
     def _update_result_labels(self, result:dict):
         if self.result_labels != []:

@@ -1,5 +1,6 @@
 from model.model import *
 from model.src.database_handler import Database_handler
+from model.src.Orms import *
 from model.src.API_Grabber import *
 from model.src.data_formatter import Data_Formatter
 
@@ -11,7 +12,10 @@ class API_Model(model):
 
     async def refresh_tables(self):
         db_handler = Database_handler()
-        await db_handler.drop_tables()
+        await db_handler.drop_table(SalaryOrm.__table__)
+        await db_handler.drop_table(VacancyOrm.__table__)
+        await db_handler.drop_table(EmployerOrm.__table__)
+        await db_handler.drop_table(AreaOrm.__table__)
         await db_handler.create_tables()
 
     def get_API_data(self, mode):

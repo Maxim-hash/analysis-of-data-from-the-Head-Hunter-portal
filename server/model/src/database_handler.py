@@ -52,7 +52,7 @@ class Database_handler:
                 elif orm == JournalOrm:
                     query_builder.add_filter(LoginFilter(data["journal"]))
                 elif orm == UserOrm:
-                    query_builder.add_filter(LoginFilter(data["status"]))
+                    query_builder.add_filter(ModeFilter(data["status"]))
                 query = query_builder.build()
                 
                 result = query.all()
@@ -83,6 +83,6 @@ class Database_handler:
             user.mode_id = new_status
             session.commit()
 
-    async def drop_tables(self):
+    async def drop_table(self, table_name):
         async with self.async_engine.begin() as conn:
-            await conn.run_sync(Base.metadata.drop_all)
+            await conn.run_sync(table_name.drop)

@@ -88,8 +88,14 @@ class ClientModel():
             return self.return_data
         if "user" in decoded_data:
             result = db_handler.select(decoded_data, UserOrm)
+            data = {}
+            for i in result:
+                obj = {**(i.__dict__)}
+                obj.pop('_sa_instance_state', None)
+                data[obj['email']] = obj.copy()
+                data[obj['email']].pop("email", None)
             self.return_data["status"] = "Access"
-            self.return_data["data"] = result
+            self.return_data["data"] = data
             return self.return_data
         result = db_handler.select(decoded_data, VacancyOrm)
         salary = []
@@ -142,7 +148,7 @@ class ClientModel():
         db_handler = Database_handler()
         journal_entry = JournalOrm(token=user_token["login"], action=action, status=status, time= datetime.today())
         await db_handler.add(journal_entry)
-    
+        
 class СurrencyConverter:
     def __init__(self) -> None:
         self.exchange = {

@@ -8,6 +8,9 @@ class DataTransmitter:
     def __init__(self, data: dict):
         self.dp = pd.DataFrame(data.values(), index=data.keys())
 
+    def get_dataframe(self):
+        return self.dp
+
     def getUniqMeta(self):
         #self.uniq_vacancy_name = self.dp["vacancy_name"].unique()
         self.uniq_area = self.dp["area_id"].unique()
@@ -41,14 +44,15 @@ class BaseHistogram(Graph):
         lower_bound = q1 - 1.5 * iqr
         upper_bound = q3 + 1.5 * iqr
         # Фильтрация выбросов
-        filtered_salaries = [x for x in salaries if lower_bound < x < upper_bound]
+        filtered_salaries = [x for x in salaries if lower_bound <= x <= upper_bound]
 
         fig, ax = plt.subplots(figsize=(10, 6))
         fig.subplots_adjust(bottom=0.2) 
         ax.hist(filtered_salaries, bins=15, color="skyblue", edgecolor='black')
         
-        mean_salary = np.mean(salaries)
-        median_salary = np.median(salaries)
+        mean_salary = np.mean(filtered_salaries)
+        median_salary = np.median(filtered_salaries)
+        
         ax.set_xlabel("Зарплата, Рублей")
         ax.set_ylabel("Количество, Штук")
         ax.set_title(f"Распределение зарплат для вакансии: {self.context['vacancy_name']}\nСредняя зарплата: {mean_salary:.2f}, Медиана зарплаты: {median_salary:.2f}")
