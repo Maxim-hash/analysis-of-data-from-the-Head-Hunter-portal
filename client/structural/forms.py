@@ -7,10 +7,7 @@ from structural.src.request_context import *
 from creational.singleton import Singleton
 from structural.config import secret_key
 from tkinter import messagebox
-from spacy.matcher import Matcher
 from scipy import stats
-import spacy
-from collections import Counter
 import jwt
 import uuid
 
@@ -388,22 +385,9 @@ class SubForms(Frame):
        
         tree.pack(side="left", expand=True, fill="both")
 
-        nlp = spacy.load("ru_core_news_sm")
-
         texts = [j for j in data.get_dataframe()["requirement"] if pd.notnull(j)]
-        all_skills = []
+
         text = "".join(texts)
-
-        doc = nlp(text)
-
-        # Извлечение навыков
-        skills = [token.text for token in doc if token.pos_ == "PROPN" or (token.pos_ == "NOUN" and token.dep_ in ["dobj", "pobj", "nsubj"])]
-
-        # Подсчет и вывод статистики навыков
-        skills_counter = Counter(skills)
-        print("Найденные навыки и количество их упоминаний:")
-        for skill, count in skills_counter.most_common():
-            print(f"{skill}: {count}")
 
     def _update_result_labels(self, result:dict):
         if self.result_labels != []:
