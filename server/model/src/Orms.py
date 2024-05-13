@@ -97,12 +97,6 @@ class VacancyOrm(Base):
     def __hash__(self):
         return hash(self.id)
     
-class SkillOrm(Base):
-    __tablename__ = "skills"
-
-    vacancy_id : Mapped[intpk]
-    skill: Mapped[str_512]
-
 class SalaryOrm(Base):
     __tablename__ = "salary"
 
