@@ -1,9 +1,11 @@
 from copy import deepcopy
 from datetime import datetime, timedelta
-import time
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
+import aiohttp
+import asyncio
+from config import HEADERS
 
 class API_Grabber():
     def __init__(self, per_page=100):
@@ -12,19 +14,23 @@ class API_Grabber():
         generator = DateIntervalGenerator()
         self.hour_interval = generator.generate_hour_intervals()
         self.mode_types = ["area", "vacancy"]
-        self.headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36'
-            }
+        self.headers = HEADERS
 
-    def fetch_page(self, url):
-        session = requests.Session()
+    async def fetch_page(self, url):
+        #session = requests.Session()
 
-        retries = Retry(total=3, backoff_factor=1, status_forcelist=[429, 500, 502, 503, 504])
-        session.mount('https://', HTTPAdapter(max_retries=retries))
+        #retries = Retry(total=3, backoff_factor=1, status_forcelist=[429, 403, 500, 502, 503, 504])
+        #session.mount('https://', HTTPAdapter(max_retries=retries))
         try:
-            response = session.get(url, headers=self.headers, timeout=5)
-            response.raise_for_status()  # Проверка на ошибки HTTP
-            return response.json()
+            async with aiohttp.ClientSession(headers=self.headers) as session:
+                async with session.get(str(url)) as response:
+                    response.raise_for_status()  # Проверка на ошибки HTTP
+                    return await response.json()
+        except aiohttp.ClientResponseError as e:
+            if e.status == 404:
+                print(f"Ошибка: {e.status}, Сообщение: {e.message}, URL: {e.request_info.url}")
+            else:
+                print(f"Ошибка HTTP: {e.status}, URL: {e.request_info.url}")
         except requests.exceptions.HTTPError as e:
             print(f"HTTP error: {e}")
         except requests.exceptions.ConnectionError as e:
@@ -34,6 +40,41 @@ class API_Grabber():
         except requests.exceptions.RequestException as e:
             print(f"Error: {e}")
 
+    async def fetch_vacancy_data(self, url, session, data):
+        try:
+            async with session.get(str(url)) as response:
+                response.raise_for_status()  # Проверка на ошибки HTTP
+                temp = await response.json()
+                data.append(temp["key_skills"])
+        except aiohttp.ClientResponseError as e:
+            if e.status == 404:
+                print(f"Ошибка: {e.status}, Сообщение: {e.message}, URL: {e.request_info.url}")
+            else:
+                print(f"Ошибка HTTP: {e.status}, URL: {e.request_info.url}")
+        except aiohttp.ClientError as e:
+            print(f"Client error: {e}")
+        except asyncio.TimeoutError as e:
+            print(f"Timeout error: {e}")
+        except Exception as e:
+            print(f"Error: {e}")
+
+    async def get_skills(self, urls):
+        data = []
+
+        async with aiohttp.ClientSession(headers=self.headers) as session:
+            tasks = [self.fetch_vacancy_data(url, session, data) for url in urls]
+            await asyncio.gather(*tasks)
+        return data
+
+    def get_skills_data(self, vacancy_ids):
+        url = URL_creator("vacancy", self.base_url)
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        urls = [f"{url.url_instance.url}/{vacancy_id}" for vacancy_id in vacancy_ids]
+        data = loop.run_until_complete(self.get_skills(urls))
+
+        return data
+        
     def prepare_request(self, mode):
         urls = []
         params = []
@@ -54,7 +95,7 @@ class API_Grabber():
                 urls.append(url.build_url())
         return urls
 
-    def get_data(self, mode, count = -1):
+    async def get_data(self, mode, count = -1):
         if mode in self.mode_types:
             collected_data = []
             
@@ -62,7 +103,7 @@ class API_Grabber():
             for url in urls:
                 if count != -1 and len(collected_data) > count:
                     break
-                response = self.fetch_page(url)
+                response = await self.fetch_page(url)
                 if type(response) == list:
                     collected_data.append(response)
                 elif response:
@@ -152,3 +193,8 @@ class DateIntervalGenerator:
             })
             current_start_date += timedelta(minutes=35)
         return intervals
+
+
+if __name__ == "__main__":
+    a = API_Grabber()
+    print(a.get_skills_data(97578723))

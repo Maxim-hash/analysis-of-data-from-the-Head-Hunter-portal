@@ -19,7 +19,7 @@ def search(token, mode = "", **kwargs):
         answer = b""
         end_signal = b"<END>"
         while True:
-            data = sock.recv(1024)
+            data = sock.recv(131072)
             answer += data
             if end_signal in data:
                 break

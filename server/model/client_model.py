@@ -3,6 +3,7 @@ import jwt
 import json
 from model.src.database_handler import *
 from controller.api_controller import *
+from model.src.API_Grabber import *
 from config import secret_key
 from datetime import datetime
 
@@ -98,14 +99,26 @@ class ClientModel():
             self.return_data["data"] = data
             return self.return_data
         result = db_handler.select(decoded_data, VacancyOrm)
+        grabber = API_Grabber()
         salary = []
+        
+        ids = [item.id for item in result]
+        dictionarys = grabber.get_skills_data(ids)
+        skills = dict(zip(ids, dictionarys))
+        for i in skills:
+            if data:  # Проверка на пустоту массива
+                names = [item['name'] for item in skills[i]]
+            else:
+                names = []
+            skills[i] = {"key_skills" : names}
         for item in result:
             salary.extend(db_handler.select(item, SalaryOrm))
+            
         
         result_salary = get_salary(salary)
         answer = {}
-        for item_vac, item_sal in zip(result, result_salary):
-            object = {**(item_vac.__dict__), **item_sal}
+        for item_vac, item_sal, item_skill in zip(result, result_salary, skills):
+            object = {**(item_vac.__dict__), **item_sal, **skills[item_skill]}
             object.pop('_sa_instance_state', None)
             answer[f"{object['id']}"] = object.copy()
             answer[f"{object['id']}"].pop("id", None)
@@ -148,7 +161,7 @@ class ClientModel():
         db_handler = Database_handler()
         journal_entry = JournalOrm(token=user_token["login"], action=action, status=status, time= datetime.today())
         await db_handler.add(journal_entry)
-        
+
 class СurrencyConverter:
     def __init__(self) -> None:
         self.exchange = {

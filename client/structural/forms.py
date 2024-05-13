@@ -1,3 +1,4 @@
+from collections import Counter
 from tkinter import *
 from tkinter import ttk
 from tkinter.ttk import Treeview
@@ -344,7 +345,8 @@ class SubForms(Frame):
         data = DataTransmitter(request.data)
         base_histogram1 = BaseHistogram(request)
         base_histogram1.draw(self.scrollable_frame)
-        uniq_exp = data.getUniqMeta()
+        uniq_exp = data.getUniqExp()
+        unic_emp = data.getUniqEmployer()
         tree = Treeview(self.scrollable_frame, columns=("Опыт работы", "Среднее зарплат", "Медиана Зарплат", "Мода зарплат", "Количество вакансий"), show="headings")
 
         # Установка заголовков столбцов
@@ -364,7 +366,10 @@ class SubForms(Frame):
         # Добавление данных в таблицу
         for i in uniq_exp:
             filtered_by_exp_dataframe = data.filterDataByExp(i)
-            salaries = [int(j) for j in filtered_by_exp_dataframe["salary"] if pd.notnull(j)] 
+            salaries = [int(j) for j in filtered_by_exp_dataframe["salary"] if pd.notnull(j)]
+
+            if not salaries:
+                continue
             q1 = np.quantile(salaries, 0.25)  # 25% квантиль
             q3 = np.quantile(salaries, 0.75)  # 75% квантиль
 
@@ -382,12 +387,67 @@ class SubForms(Frame):
 
             tree_data = [i, mean_salary, median_salary, mode.mode, len(filtered_salaries)]
             tree.insert("", "end", values=tree_data)
-       
-        tree.pack(side="left", expand=True, fill="both")
+        tree.pack(expand=True, fill="both")
+        key_skills_frame = Frame(self.scrollable_frame)
+        key_skills_frame.pack()
+        texts = data.get_dataframe()["key_skills"].dropna().tolist()
+        temp = [i for item in texts for i in item]
+        key_skills_tree = Treeview(key_skills_frame, columns=("Ключевой навык", "Кол-во"), show="headings")
+        key_skills_tree.heading("Ключевой навык", text="Ключевой навык")
+        key_skills_tree.heading("Кол-во", text="Кол-во")
 
-        texts = [j for j in data.get_dataframe()["requirement"] if pd.notnull(j)]
+        # Установка ширины столбцов
+        key_skills_tree.column("Ключевой навык", width=100)
+        key_skills_tree.column("Кол-во", width=100)
+        key_skill_data = Counter(temp).most_common(100)
 
-        text = "".join(texts)
+        for i in key_skill_data:
+            key_skills_tree.insert("", "end", values=i)
+        key_skills_tree.pack(expand=True, fill="both", side=LEFT)
+        pie_gramm = pieGramm(request)
+        pie_gramm.draw(key_skills_frame, key_skill_data)
+
+        emp_tree = Treeview(self.scrollable_frame, columns=("Компания", "Среднее зарплат", "Медиана Зарплат", "Мода зарплат", "Количество вакансий"), show="headings")
+
+        # Установка заголовков столбцов
+        emp_tree.heading("Компания", text="Компания")
+        emp_tree.heading("Среднее зарплат", text="Среднее зарплат")
+        emp_tree.heading("Медиана Зарплат", text="Медиана Зарплат")
+        emp_tree.heading("Мода зарплат", text="Мода зарплат")
+        emp_tree.heading("Количество вакансий", text="Количество вакансий")
+
+        # Установка ширины столбцов
+        emp_tree.column("Компания", width=60)
+        emp_tree.column("Среднее зарплат", width=100)
+        emp_tree.column("Медиана Зарплат", width=100)
+        emp_tree.column("Мода зарплат", width=100)
+        emp_tree.column("Количество вакансий", width=100)
+
+        # Добавление данных в таблицу
+        for i in unic_emp:
+            filtered_by_emp_dataframe = data.filterDataByEmp(i)
+            salaries = [int(j) for j in filtered_by_emp_dataframe["salary"] if pd.notnull(j)]
+
+            if not salaries:
+                continue
+            q1 = np.quantile(salaries, 0.25)  # 25% квантиль
+            q3 = np.quantile(salaries, 0.75)  # 75% квантиль
+
+            iqr = q3 - q1  # Межквартильный размах
+
+            # Определение границ для отсечения выбросов
+            lower_bound = q1 - 1.5 * iqr
+            upper_bound = q3 + 1.5 * iqr
+
+            # Фильтрация выбросов
+            filtered_salaries = [x for x in salaries if lower_bound <= x <= upper_bound]
+            mean_salary = np.mean(filtered_salaries)
+            median_salary = np.median(filtered_salaries)
+            mode = stats.mode(filtered_salaries)
+
+            tree_data = [i, mean_salary, median_salary, mode.mode, len(filtered_salaries)]
+            emp_tree.insert("", "end", values=tree_data)
+        emp_tree.pack(anchor=W,expand=True, fill="both")
 
     def _update_result_labels(self, result:dict):
         if self.result_labels != []:

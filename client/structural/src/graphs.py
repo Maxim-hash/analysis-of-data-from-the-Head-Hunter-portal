@@ -11,11 +11,14 @@ class DataTransmitter:
     def get_dataframe(self):
         return self.dp
 
-    def getUniqMeta(self):
-        #self.uniq_vacancy_name = self.dp["vacancy_name"].unique()
-        self.uniq_area = self.dp["area_id"].unique()
-        self.uniq_exp = self.dp['exp'].unique()
-        return self.uniq_exp
+    def getUniqExp(self):
+        return self.dp['exp'].unique()
+    
+    def getUniqEmployer(self):
+        return self.dp["employers_name"].unique()
+    
+    def filterDataByEmp(self, filter):
+        return self.dp[self.dp["employers_name"] == filter]
     
     def filterDataByExp(self, filter):
         return self.dp[self.dp['exp'] == filter]
@@ -35,6 +38,8 @@ class Graph:
 class BaseHistogram(Graph):
     def draw(self, container) -> None:
         salaries = [int(i) for i in self.dp["salary"] if pd.notnull(i)] 
+        if len(salaries) <= 1:
+            return None
         q1 = np.quantile(salaries, 0.25)  # 25% квантиль
         q3 = np.quantile(salaries, 0.75)  # 75% квантиль
 
@@ -66,6 +71,22 @@ class BaseHistogram(Graph):
         canvas.draw()
         canvas.get_tk_widget().pack(fill="both", expand=True)
 
+
+class pieGramm(Graph):
+    def draw(self, container, data):
+        labels = [i[0] for i in data[:20]]
+        count = [i[1] for i in data[:20]]
+   
+        fig, ax = plt.subplots(figsize=(10, 6))
+        fig.subplots_adjust(bottom=0.2) 
+
+        ax.pie(count, autopct='%1.1f%%', startangle=90)
+        ax.legend(labels, title="Ключевые навыки", loc="center left", bbox_to_anchor=(1, 0, 0.5, 1))
+        canvas = FigureCanvasTkAgg(fig, master=container)
+        canvas.draw()
+
+        canvas.get_tk_widget().pack(side="right")
+        
 
 class SalaryByExperienceHistograms(Graph):
     def draw(self, container):

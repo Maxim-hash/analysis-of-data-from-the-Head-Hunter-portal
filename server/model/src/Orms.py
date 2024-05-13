@@ -100,7 +100,7 @@ class VacancyOrm(Base):
 class SkillOrm(Base):
     __tablename__ = "skills"
 
-    id : Mapped[intpk]
+    vacancy_id : Mapped[intpk]
     skill: Mapped[str_512]
 
 class SalaryOrm(Base):
