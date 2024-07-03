@@ -44,7 +44,7 @@ class ClientModel():
 
         if user == None:
             self.return_data["status"] = "Denied"
-            self.return_data["data"] = 'Invalid username'
+            self.return_data["data"] = 'User is not registered'
             return self.return_data
         
         if user.mode_id == 3:
@@ -155,7 +155,6 @@ class ClientModel():
             self.return_data["data"] = "Database has been updated"
         return self.return_data
 
-    
     async def logging(self, token, action, status):
         user_token = jwt.decode(token, secret_key, algorithms=["HS256"])
         db_handler = Database_handler()

@@ -66,6 +66,7 @@ class MainForm(Frame):
 
     def change_password(self):
         self.clear_display_frame()
+        self.user_button.config(state=NORMAL)
         self.change_password_frame.update()
 
     def show_initial_content(self):
@@ -291,7 +292,6 @@ class AdminFrame(Frame):
  
         tree.bind("<<TreeviewSelect>>", item_selected)
 
-        # Размещение виджета Treeview в окне приложения
         tree.pack(side="left", expand=True, fill="both")
 
     def update(self):
@@ -305,17 +305,20 @@ class AdminFrame(Frame):
 class SubForms(Frame):
     def __init__(self, master, data, callback):
         super().__init__(master=master)
-        self.canvas = Canvas(self)
+        self.canvas = Canvas(self, borderwidth=0, background='white')
         self.scrollbar = Scrollbar(self, orient="vertical", command=self.canvas.yview)
-        self.scrollable_frame = Frame(self.canvas)
+        self.scrollable_frame = Frame(self.canvas,background='white')
+
         self.canvas.pack(side="left", fill="both", expand=True)
         self.scrollbar.pack(side="right", fill="y")
-        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+
+        self.scrollable_frame_id = self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
 
         def onFrameConfigure(canvas):
             canvas.configure(scrollregion=canvas.bbox("all"))
-        self.canvas.bind("<MouseWheel>", self._on_mousewheel)
+        self.canvas.bind_all("<MouseWheel>", self._on_mousewheel)
+        self.bind("<Configure>", self.on_resize)
         self.scrollable_frame.bind("<Configure>", lambda event, canvas=self.canvas: onFrameConfigure(canvas))
 
         self.count_vacancy = Label(self.scrollable_frame, text='')
@@ -325,6 +328,9 @@ class SubForms(Frame):
         self.download_raw_data_button.pack(anchor=NE)
     
         self.show_stat(data)
+
+    def on_resize(self, event):
+        self.canvas.itemconfig(self.scrollable_frame_id, width=self.canvas.winfo_width())
 
     def download_raw_data(self, data: RequestContext):
         filename = f"{uuid.uuid4()}.json"
@@ -509,4 +515,17 @@ class SearchForm(Frame, Singleton):
         vacancy_name = self.entry_vacancy_name.get()
         area = self.entry_area.get()
         exp = self.selected_exp.get()
-        self.create_new_form(self.on_search(token=self.token, vacancy_name=vacancy_name, area=area, exp=exp), vacancy_name)
+        answer = self.on_search(token=self.token, vacancy_name=vacancy_name, area=area, exp=exp)
+        if answer.data:
+            self.create_new_form(answer, vacancy_name)
+        else:
+            exp_key = get_key_exp(self.exp_meta, answer.context["exp"])
+            messagebox.showerror("Результатов не найдено", f"По вашему запросу \n{answer.context['vacancy_name']}\n{answer.context['area']}\n{exp_key}\n не было найдено.\nПопробуйте другой запрос.")
+
+def get_key_exp(exp_meta, exp):
+    values = list(exp_meta.values())
+    index = values.index(exp)
+
+    key = list(exp_meta.keys())[index]
+
+    return key

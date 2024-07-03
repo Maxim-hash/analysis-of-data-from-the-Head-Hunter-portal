@@ -15,7 +15,6 @@ class API_Model( model):
     }
 
     async def refresh_tables(self):
-        await self.db_handler.drop_table(SkillOrm.__table__)
         await self.db_handler.drop_table(SalaryOrm.__table__)
         await self.db_handler.drop_table(VacancyOrm.__table__)
         await self.db_handler.drop_table(EmployerOrm.__table__)
@@ -36,9 +35,6 @@ class API_Model( model):
         api_grabber = API_Grabber()
         skills = await api_grabber.get_skills_data(id)
         return skills
-
-    async def load_skills(self, id, data):
-        await self.db_handler.add(SkillOrm(vacancy_id= id, skill = data))
 
     async def load_data_into_tables(self, formatted_data):
 

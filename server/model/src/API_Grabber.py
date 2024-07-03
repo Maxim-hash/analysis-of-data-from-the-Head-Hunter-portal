@@ -193,8 +193,3 @@ class DateIntervalGenerator:
             })
             current_start_date += timedelta(minutes=35)
         return intervals
-
-
-if __name__ == "__main__":
-    a = API_Grabber()
-    print(a.get_skills_data(97578723))
