@@ -1,7 +1,6 @@
 АННОТАЦИЯ
 
 Выпускной  квалификационной работы  			Еременко М.А 
-                                                    					   (Фамилия,И.О.)
 по теме «Разработка приложения для анализа рынка труда на основе данных с портала Head Hunter »
 
 Ключевые слова: Python, PostgreSQL, asyncio, tkinter, numpy, socket, aiohttp, SQLAlchemy, matplotlib, pandas, JSON, API HeadHunter, MVC, ООП, обработка данных, визуализация данных.
