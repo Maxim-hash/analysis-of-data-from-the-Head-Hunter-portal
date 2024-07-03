@@ -20,11 +20,11 @@
 
 Screenshot that displays the result of the entered data
 <p align="center">
-<img  src="analysis-of-data-from-the-Head-Hunter-portal/main/images/Архитектура приложения.png"  width="350" alt="Архитектура приложения"/>
+<img  src="analysis-of-data-from-the-Head-Hunter-portal/blob/main/images/Архитектура приложения.png"  width="350" alt="Архитектура приложения"/>
 </p>
 <p align="center">
-<img  src="analysis-of-data-from-the-Head-Hunter-portal/main/images/архитектура частей приложения.png"  width="350" alt="архитектура частей приложения"/>
+<img  src="analysis-of-data-from-the-Head-Hunter-portal/blob/main/images/архитектура частей приложения.png"  width="350" alt="архитектура частей приложения"/>
 </p>
 <p align="center">
-<img  src="analysis-of-data-from-the-Head-Hunter-portal/main/images/Диаграмма прецедентов.png"  width="350" alt="Диаграмма прецедентов"/>
+<img  src="analysis-of-data-from-the-Head-Hunter-portal/blob/main/images/Диаграмма прецедентов.png"  width="350" alt="Диаграмма прецедентов"/>
 </p>
