@@ -18,7 +18,6 @@
 эффективно анализировать и визуализировать данные о вакансиях с
 использованием современных технологий и библиотек.
 
-Screenshot that displays the result of the entered data
 <p align="center">
 <img  src="https://github.com/Maxim-hash/analysis-of-data-from-the-Head-Hunter-portal/blob/main/images/Архитектура приложения.png"  width="700" alt="Архитектура приложения"/>
 </p>
