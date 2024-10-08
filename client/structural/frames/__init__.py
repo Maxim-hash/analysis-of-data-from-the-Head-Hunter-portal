@@ -1,0 +1,3 @@
+from structural.frames.adminframe import AdminFrame
+from structural.frames.changepasswordframe import ChangePasswordFrame
+from structural.frames.userframe import UserFrame

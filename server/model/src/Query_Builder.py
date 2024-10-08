@@ -118,6 +118,8 @@ class RegionFilter(FilterInterface):
         for subregion_id, in subregions:
             all_region_ids.extend(self._get_all_subregions(subregion_id))
         return all_region_ids
+    
+    
 
 class ExperienceFilter(FilterInterface):
     def __init__(self, experience: int):
