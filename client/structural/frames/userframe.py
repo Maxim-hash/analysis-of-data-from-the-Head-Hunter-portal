@@ -1,7 +1,8 @@
 from tkinter import W
 from tkinter import Frame, Label, Scrollbar
 from structural.config import secret_key
-from structural.src.tree import Tree
+from structural.src.tree import JournalTree
+
 import jwt
 
 
@@ -19,10 +20,9 @@ class UserFrame(Frame):
 
         container = Frame(self.master)
         container.pack(expand=False, fill="both")
+
         #  Создание виджета Treeview
-        column_name = ["ID", "Login", "Action", "Status", "Time"]
-        column_size = [15, 30, 500, 20, 40]
-        tree = Tree(container, column_name, column_size)
+        tree = JournalTree(container)
 
         # Добавление данных в таблицу
         tree_data = [[i, data[i]["token"], data[i]["action"], data[i]["status"], data[i]["time"]] for i in data]
@@ -39,7 +39,6 @@ class UserFrame(Frame):
         tree.configure(xscrollcommand=scrollbar_horizontal.set)
         scrollbar_horizontal.pack(side="bottom", fill="x")
 
-        # Размещение виджета Treeview в окне приложения
         tree.pack(side="left", expand=True, fill="both")
 
     def update(self):

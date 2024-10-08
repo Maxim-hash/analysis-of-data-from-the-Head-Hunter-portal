@@ -35,3 +35,15 @@ class EmployerTree(Tree):
         columns_name = ["Компания", "Среднее зарплат", "Медиана Зарплат", "Мода зарплат", "Количество вакансий"]
         columns_size = [60, 100, 100, 100, 100]
         super().__init__(container, columns_name, columns_size)
+
+class JournalTree(Tree):
+    def __init__(self, container, columns_name: List = [], columns_size: List = []):
+        columns_name = ["ID", "Login", "Action", "Status", "Time"]
+        columns_size = [15, 30, 500, 20, 40]
+        super().__init__(container, columns_name, columns_size)
+
+class UserTree(Tree):
+    def __init__(self, container, columns_name: List = [], columns_size: List = []):
+        columns_name = ["Login", "Token" , "Status"]
+        columns_size = [30, 500, 15]
+        super().__init__(container, columns_name, columns_size)

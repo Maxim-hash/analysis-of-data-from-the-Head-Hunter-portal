@@ -1,6 +1,8 @@
 from tkinter import NE, messagebox, Button, Frame, Label, Scrollbar
 from tkinter.ttk import Treeview
 
+from structural.src.tree import JournalTree, UserTree
+
 
 class AdminFrame(Frame):
     def __init__(self, master, search, token):
@@ -36,17 +38,7 @@ class AdminFrame(Frame):
         Label(container, text="Список заблокированных пользователей", bg='white').pack()
         data = self.search(self.token, user="", status=3).data
 
-        tree = Treeview(container, columns=("Login", "Token", "Status"), show="headings")
-
-        # Установка заголовков столбцов
-        tree.heading("Login", text="Login")
-        tree.heading("Token", text="Token")
-        tree.heading("Status", text="Status")
-
-        # Установка ширины столбцов
-        tree.column("Login", width=30)
-        tree.column("Token", width=500)
-        tree.column("Status", width=15)
+        tree = UserTree(container)
 
         # Добавление данных в таблицу
         for i in data:
@@ -82,21 +74,7 @@ class AdminFrame(Frame):
 
     def show_journal(self, container, data):
         Label(container, text="Журнал действий пользователей", bg='white').pack()
-        tree = Treeview(container, columns=("ID", "Login", "Action", "Status", "Time"), show="headings")
-
-        # Установка заголовков столбцов
-        tree.heading("ID", text="ID")
-        tree.heading("Login", text="Login")
-        tree.heading("Action", text="Action")
-        tree.heading("Status", text="Status")
-        tree.heading("Time", text="Time")
-
-        # Установка ширины столбцов
-        tree.column("ID", width=15)
-        tree.column("Login", width=30)
-        tree.column("Action", width=500)
-        tree.column("Status", width=20)
-        tree.column("Time", width=40)
+        tree = JournalTree(container)
 
         # Добавление данных в таблицу
         for i in data:
