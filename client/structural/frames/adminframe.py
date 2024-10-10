@@ -45,16 +45,6 @@ class AdminFrame(Frame):
             tree_data = [i, data[i]["token"], data[i]["mode_id"]]
 
             tree.insert("", "end", values=tree_data)
-       
-        # Создание вертикальной прокрутки
-        scrollbar_vertical = Scrollbar(container, orient="vertical", command=tree.yview)
-        tree.configure(yscrollcommand=scrollbar_vertical.set)
-        scrollbar_vertical.pack(side="right", fill="y")
-
-        # Создание горизонтальной прокрутки
-        scrollbar_horizontal = Scrollbar(container, orient="horizontal", command=tree.xview)
-        tree.configure(xscrollcommand=scrollbar_horizontal.set)
-        scrollbar_horizontal.pack(side="bottom", fill="x")
 
         def item_selected(event):
             selected_people = ""
@@ -82,16 +72,6 @@ class AdminFrame(Frame):
 
             tree.insert("", "end", values=tree_data)
        
-        # Создание вертикальной прокрутки
-        scrollbar_vertical = Scrollbar(container, orient="vertical", command=tree.yview)
-        tree.configure(yscrollcommand=scrollbar_vertical.set)
-        scrollbar_vertical.pack(side="right", fill="y")
-
-        # Создание горизонтальной прокрутки
-        scrollbar_horizontal = Scrollbar(container, orient="horizontal", command=tree.xview)
-        tree.configure(xscrollcommand=scrollbar_horizontal.set)
-        scrollbar_horizontal.pack(side="bottom", fill="x")
-
         def item_selected(event):
             selected_people = ""
             for selected_item in tree.selection():

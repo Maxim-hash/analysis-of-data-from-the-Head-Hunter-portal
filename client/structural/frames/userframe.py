@@ -28,16 +28,6 @@ class UserFrame(Frame):
         tree_data = [[i, data[i]["token"], data[i]["action"], data[i]["status"], data[i]["time"]] for i in data]
 
         tree.set_data(tree_data)
-       
-        # Создание вертикальной прокрутки
-        scrollbar_vertical = Scrollbar(container, orient="vertical", command=tree.yview)
-        tree.configure(yscrollcommand=scrollbar_vertical.set)
-        scrollbar_vertical.pack(side="right", fill="y")
-
-        # Создание горизонтальной прокрутки
-        scrollbar_horizontal = Scrollbar(container, orient="horizontal", command=tree.xview)
-        tree.configure(xscrollcommand=scrollbar_horizontal.set)
-        scrollbar_horizontal.pack(side="bottom", fill="x")
 
         tree.pack(side="left", expand=True, fill="both")
 

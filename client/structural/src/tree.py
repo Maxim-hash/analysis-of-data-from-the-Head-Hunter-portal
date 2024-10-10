@@ -1,3 +1,4 @@
+from tkinter import Scrollbar
 from tkinter.ttk import Treeview
 from typing import List
 
@@ -9,6 +10,9 @@ class Tree(Treeview):
             self.set_heading(columns_name)
         if columns_size:
             self.set_heading_size(columns_size)
+
+        self.set_horizontal_scrollbar(container)
+        self.set_vertical_scrollbar(container)
 
     def set_heading_size(self,columns_name: List = [], column_size: List = []):
         if column_size and not len(column_size) > len(columns_name): 
@@ -23,6 +27,17 @@ class Tree(Treeview):
     def set_data(self, data:List):
         for i in data:
             self.insert("", "end", values=i)
+
+    def set_vertical_scrollbar(self, container):
+        scrollbar_vertical = Scrollbar(container, orient="vertical", command=self.yview)
+        self.configure(yscrollcommand=scrollbar_vertical.set)
+        scrollbar_vertical.pack(side="right", fill="y")
+
+    def set_horizontal_scrollbar(self, container):
+        scrollbar_horizontal = Scrollbar(container, orient="horizontal", command=self.xview)
+        self.configure(xscrollcommand=scrollbar_horizontal.set)
+        scrollbar_horizontal.pack(side="bottom", fill="x")
+
 
 class ExperienceTree(Tree):
     def __init__(self, container, columns_name: List = [], columns_size: List = []):

@@ -22,7 +22,7 @@ class client_controller(controller):
             result = model.update(needed_data)
         else:
             result = "Incorrect Data"
-        if "token" in data:
+        if "token" in data and "journal" not in data and "user" not in data:
             logging_data = {key : value for key, value in data.items() if key != "token"}
             asyncio.run(model.logging(data["token"], str(logging_data), converter[result['status']]))
 

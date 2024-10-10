@@ -73,7 +73,7 @@ class SubForms(Frame):
             if not salaries:
                 continue
             result = prepare_data(salaries)
-
+ 
             tree_data = [i, result[1],result[2], result[3].mode, len(result[0])]
             tree.insert("", "end", values=tree_data)
 
