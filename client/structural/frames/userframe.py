@@ -21,12 +21,8 @@ class UserFrame(Frame):
         container = Frame(self.master)
         container.pack(expand=False, fill="both")
 
-        #  Создание виджета Treeview
         tree = JournalTree(container)
-
-        # Добавление данных в таблицу
         tree_data = [[i, data[i]["token"], data[i]["action"], data[i]["status"], data[i]["time"]] for i in data]
-
         tree.set_data(tree_data)
 
         tree.pack(side="left", expand=True, fill="both")

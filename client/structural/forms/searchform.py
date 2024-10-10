@@ -2,6 +2,8 @@ from tkinter import BOTH, Entry, StringVar, messagebox
 from tkinter import ttk
 from tkinter import Button, Frame, Label
 
+from structural.src.field import VacancyNameField, ExperienceField, RegionField 
+from structural.src.request_context import RequestContext
 from creational.singleton import Singleton
 from structural.src.utils import get_key_exp
 from structural.src.search import search
@@ -10,11 +12,11 @@ class SearchFormController:
     def __init__(self, create_new_form_func) -> None:
         self.create_new_form = create_new_form_func
 
-    def get_results(self, **kwargs):
+    def get_results(self, **kwargs) -> RequestContext:
         response = search(**kwargs)
         return response
     
-    def create_new_form(self, response, name):
+    def create_new_form(self, response, name) -> None:
         self.create_new_form(response, name)
     
 class SearchFormUI:
@@ -37,7 +39,7 @@ class SearchFormUI:
 
         Button(self.root, text="Поиск", command=self.on_button_clicked).pack(pady=10)
 
-    def on_button_clicked(self):
+    def on_button_clicked(self) -> None:
         self.data = {
             "token" : self.token,
             "vacancy_name" : self.vacancy_name_field.entry_vacancy_name.get(),
@@ -53,47 +55,11 @@ class SearchFormUI:
             exp_key = get_key_exp(self.experience_field.exp_meta, response.context["exp"])
             messagebox.showerror("Результатов не найдено", f"По вашему запросу \n{response.context['vacancy_name']}\n{response.context['area']}\n{exp_key}\n не было найдено.\nПопробуйте другой запрос.")
 
-    def pack(self):
+    def pack(self) -> None:
         self.root.pack(expand=True, fill=BOTH)
 
-class Field:
-    def __init__(self, master) -> None:
-        self.root = master
-    def draw(self):
-        pass
-
-class VacancyNameField(Field):
-    def draw(self):
-        Label(self.root, text="Введите название вакансии:").pack(pady=10)
-        self.entry_vacancy_name = Entry(self.root)
-        self.entry_vacancy_name.pack(pady=10)
- 
-class RegionField(Field):
-    def draw(self):
-        Label(self.root, text="Введите название региона:").pack(pady=10)
-        self.entry_area = Entry(self.root)
-        self.entry_area.pack(pady=10)
-
-class ExperienceField(Field):
-    def __init__(self, master) -> None:
-        super().__init__(master)
-        self.exp_meta = {
-            "Не имеет значения" : "",
-            "От 1 года до 3 лет" : "between1And3",
-            "Нет опыта" : "noExperience",
-            "От 3 до 6 лет" : "between3And6",
-            "Более 6 лет" : "moreThan6"
-        }
-        self.selected_exp = StringVar(value=self.exp_meta["Не имеет значения"])
-        
-    def draw(self):
-        Label(self.root, text="Опыт работы").pack(pady=10)
-        for value in self.exp_meta:
-            radiobutton_exp = ttk.Radiobutton(self.root, text=value, value=self.exp_meta[value], variable=self.selected_exp)
-            radiobutton_exp.pack(padx=5, pady=5)
-
 class SearchForm(Singleton):
-    def __init__(self, master, extension, token):
+    def __init__(self, master, extension, token) -> None:
         super().__init__()
         self.token = token
 
@@ -104,5 +70,5 @@ class SearchForm(Singleton):
 
         self.ui.showUI()
         
-    def pack(self):
+    def pack(self) -> None:
         self.ui.pack()

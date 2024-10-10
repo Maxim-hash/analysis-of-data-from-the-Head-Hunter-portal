@@ -4,7 +4,7 @@ from structural.src.request_builder import *
 from structural.src.graphs import *
 from structural.src.request_context import *
 
-def search(token, mode = "", **kwargs):
+def search(token, mode = "", **kwargs) -> RequestContext:
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     
     try:

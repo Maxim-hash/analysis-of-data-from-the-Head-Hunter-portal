@@ -36,3 +36,4 @@ class ChangePasswordFrame(Frame):
 
     def update(self):
         self.makeUI()
+
