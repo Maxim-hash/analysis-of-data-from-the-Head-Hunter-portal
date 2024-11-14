@@ -38,7 +38,15 @@ class LocalStorage(Singleton):
 
         return users
     
-    
+    def getUser(self, username):
+        cursor = self.connection.cursor()
+
+        query = f"SELECT username, password FROM Users WHERE username='{username}'"
+
+        cursor.execute(query)
+        user = cursor.fetchone()
+
+        return user
     
     def createUser(self, newUser, password):
         cursor = self.connection.cursor()

@@ -29,6 +29,7 @@ class LocalStorageManager(Singleton):
             return True
         
         return False
+    
 
     def getUsers(self):
         users = self.database.getUsers()
