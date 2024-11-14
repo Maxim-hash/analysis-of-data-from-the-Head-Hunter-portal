@@ -30,6 +30,17 @@ class LocalStorageManager(Singleton):
         
         return False
     
+    def createUser(self, username, password):
+        user = self.database.getUser(username)
+        if user:
+            return 
+        
+        if password:
+            self.database.createUser(username, password)
+
+    def createEntry(self, entry):
+        if self.is_exist_current_user():
+            self.database.createJournalEntry(self.__current_user__, entry)
 
     def getUsers(self):
         users = self.database.getUsers()
@@ -44,7 +55,10 @@ class LocalStorageManager(Singleton):
     
 
 lsm = LocalStorageManager()
-#lsm.set_current_user("ALLA")
-for user in lsm.getUsers():
-    print(user)
-#print(lsm.getUsers())
+username = "ALLA"
+lsm.createUser(username, "dqfwqwfg")
+lsm.set_current_user(username)
+for entry in lsm.getEntries():
+    print(entry)
+
+print(lsm.getUsers())
