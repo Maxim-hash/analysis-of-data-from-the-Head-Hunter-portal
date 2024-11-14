@@ -112,13 +112,3 @@ class SubForms(Frame):
             emp_tree.insert("", "end", values=tree_data)
 
         emp_tree.pack(anchor=W,expand=True, fill="both")
-
-    def _update_result_labels(self, result:dict):
-        if self.result_labels != []:
-            for i in self.result_labels:
-                i["text"] = ''
-                i.destroy()
-            self.result_labels = []
-        self.count_vacancy["text"] = f"Количество вакансий: {len(result)}"
-        self.count_vacancy.pack(anchor=NW)
-        self.result_labels.extend(list(map(lambda x: Label(self, text=x).pack(), result.values())))

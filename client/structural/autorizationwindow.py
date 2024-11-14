@@ -1,6 +1,7 @@
 import socket
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
 from structural.config import *
 from creational.singleton import Singleton
 from structural.src.request_builder import *
@@ -60,6 +61,8 @@ def authorization(message:str):
         sock.send(message.encode(encoding))
         resp = sock.recv(1024)
         data = resp.decode(encoding)[:-5]
+    except Exception as e:
+        messagebox.showerror("Connection failed", f"{e}")
     except:
         data = "202"
         print("На сервере ведутся технические работы приносим свои извинение за предоставленные неудобства."

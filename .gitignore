@@ -5,6 +5,7 @@ test.py
 
 venv/
 dist/
+build/
 
 *.json
 
@@ -12,3 +13,8 @@ dist/
 
 *.txt
 
+*.exe
+
+*.pyc 
+
+*.db
