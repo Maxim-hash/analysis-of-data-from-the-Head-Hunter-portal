@@ -38,11 +38,19 @@ class LocalStorage(Singleton):
 
         return users
     
-    def createUser(self, newuser, password):
+    def createUser(self, newUser, password):
         cursor = self.connection.cursor()
 
         query = "INSERT INTO Users (username, password) VALUES (?, ?)" 
-        cursor.execute(query, (newuser, password))
+        cursor.execute(query, (newUser, password))
+
+        self.connection.commit()
+
+    def createJournalEntry(self, currentUser, entry):
+        cursor = self.connection.cursor()
+
+        query = "INSERT INTO Journal (username, action) VALUES (?, ?)"
+        cursor.execute(query, (currentUser, entry))
 
         self.connection.commit()
     
@@ -70,7 +78,7 @@ class LocalStorage(Singleton):
 
 a = LocalStorage()
 
-a.createTables()
-a.createUser("OLEG", "dqwpffewgf")
+#a.createTables()
+#a.createUser("OLEG", "dqwpffewgf")
 
 print(a.getUsers())
