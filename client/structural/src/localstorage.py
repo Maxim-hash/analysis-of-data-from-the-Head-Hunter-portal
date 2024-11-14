@@ -31,7 +31,7 @@ class LocalStorage(Singleton):
     def getUsers(self) -> list:
         cursor = self.connection.cursor()
 
-        query = f"SELECT * FROM Users"
+        query = "SELECT username, password FROM Users"
 
         cursor.execute(query)
         users = cursor.fetchall()
@@ -53,6 +53,16 @@ class LocalStorage(Singleton):
         cursor.execute(query, (currentUser, entry))
 
         self.connection.commit()
+
+    def getJournalEntry(self, currentUser):
+        cursor = self.connection.cursor()
+
+        query = f"SELECT action FROM Journal WHERE username='{currentUser}'"
+        cursor.execute(query)
+        raw_entries = cursor.fetchall()
+        entries = [entry[0] for entry in raw_entries]
+
+        return entries
     
     def createTables(self):
         cursor = self.connection.cursor()
@@ -79,6 +89,10 @@ class LocalStorage(Singleton):
 a = LocalStorage()
 
 #a.createTables()
-#a.createUser("OLEG", "dqwpffewgf")
+a.createUser("ALLA", "dqwpffewgf")
+
+a.createJournalEntry("ALLA", "testing")
+
 
 print(a.getUsers())
+print(a.getJournalEntry("ALLA"))
