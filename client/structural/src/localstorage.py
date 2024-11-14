@@ -38,6 +38,8 @@ class LocalStorage(Singleton):
 
         return users
     
+    
+    
     def createUser(self, newUser, password):
         cursor = self.connection.cursor()
 
