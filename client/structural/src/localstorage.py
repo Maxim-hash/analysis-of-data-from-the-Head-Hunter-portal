@@ -83,16 +83,3 @@ class LocalStorage(Singleton):
             """
         cursor.execute(query)
         self.connection.commit
-
-
-
-a = LocalStorage()
-
-#a.createTables()
-a.createUser("ALLA", "dqwpffewgf")
-
-a.createJournalEntry("ALLA", "testing")
-
-
-print(a.getUsers())
-print(a.getJournalEntry("ALLA"))
