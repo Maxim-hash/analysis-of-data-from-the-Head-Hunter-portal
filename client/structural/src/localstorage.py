@@ -92,4 +92,18 @@ class LocalStorage(Singleton):
                 action TEXT NOT NULL)
             """
         cursor.execute(query)
+
         self.connection.commit
+
+
+    def deleteFromTables(self):
+        cursor = self.connection.cursor()
+
+        query = "DELETE FROM Users"
+
+        cursor.execute(query)
+
+        query = "DELETE FROM Journal"
+        cursor.execute(query)
+
+        self.connection.commit()

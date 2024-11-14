@@ -18,6 +18,7 @@ class LocalStorageManager(Singleton):
 
     def __init__(self):
         self.database = LocalStorage()
+        self.database.createTables()
 
     @classmethod
     def set_current_user(cls, currentUser):
@@ -52,9 +53,14 @@ class LocalStorageManager(Singleton):
             entries = self.database.getJournalEntries(self.__current_user__)
 
             return entries
+        
+    def cleanTables(self):
+        self.database.deleteFromTables()
+
     
 
 lsm = LocalStorageManager()
+#lsm.cleanTables()
 username = "ALLA"
 lsm.createUser(username, "dqfwqwfg")
 lsm.set_current_user(username)
