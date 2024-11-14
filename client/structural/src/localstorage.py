@@ -13,6 +13,8 @@ class Singleton(object):
         pass
 
 class LocalStorage(Singleton):
+    """Storage for keeping local data"""
+
     __db_name__ = "database.db"
     
     def __init__(self) -> None:
@@ -23,12 +25,16 @@ class LocalStorage(Singleton):
         self.connection.close()
 
     def setConnection(self) -> None:
+        """Create connection with sqlite engine"""
+
         try:
             self.connection = sqlite3.connect(self.__db_name__)
         except Error:
             print(Error)
 
     def getUsers(self) -> list:
+        """Get all users"""
+
         cursor = self.connection.cursor()
 
         query = "SELECT username, password FROM Users"
@@ -39,6 +45,8 @@ class LocalStorage(Singleton):
         return users
     
     def getUser(self, username):
+        """Get user by current username"""
+
         cursor = self.connection.cursor()
 
         query = f"SELECT username, password FROM Users WHERE username='{username}'"
@@ -49,6 +57,8 @@ class LocalStorage(Singleton):
         return user
     
     def createUser(self, newUser, password):
+        """Creating user in Users"""
+
         cursor = self.connection.cursor()
 
         query = "INSERT INTO Users (username, password) VALUES (?, ?)" 
@@ -57,6 +67,8 @@ class LocalStorage(Singleton):
         self.connection.commit()
 
     def createJournalEntry(self, currentUser, entry):
+        """Creating entry in Journal"""
+
         cursor = self.connection.cursor()
 
         query = "INSERT INTO Journal (username, action) VALUES (?, ?)"
@@ -65,6 +77,8 @@ class LocalStorage(Singleton):
         self.connection.commit()
 
     def getJournalEntries(self, currentUser):
+        """Get entries from Journal"""
+
         cursor = self.connection.cursor()
 
         query = f"SELECT action FROM Journal WHERE username='{currentUser}'"
@@ -75,6 +89,8 @@ class LocalStorage(Singleton):
         return entries
     
     def createTables(self):
+        """Creating tables in database"""
+
         cursor = self.connection.cursor()
         
         query = """
@@ -96,11 +112,12 @@ class LocalStorage(Singleton):
         self.connection.commit
 
 
-    def deleteFromTables(self):
+    def cleanTables(self):
+        """Delete all data from tables"""
+
         cursor = self.connection.cursor()
 
         query = "DELETE FROM Users"
-
         cursor.execute(query)
 
         query = "DELETE FROM Journal"

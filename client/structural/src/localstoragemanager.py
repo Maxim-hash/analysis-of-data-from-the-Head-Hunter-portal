@@ -60,7 +60,7 @@ class LocalStorageManager(Singleton):
     
 
 lsm = LocalStorageManager()
-#lsm.cleanTables()
+lsm.cleanTables()
 username = "ALLA"
 lsm.createUser(username, "dqfwqwfg")
 lsm.set_current_user(username)
