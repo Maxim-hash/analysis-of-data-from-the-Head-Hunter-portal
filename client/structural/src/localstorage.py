@@ -54,7 +54,7 @@ class LocalStorage(Singleton):
 
         self.connection.commit()
 
-    def getJournalEntry(self, currentUser):
+    def getJournalEntries(self, currentUser):
         cursor = self.connection.cursor()
 
         query = f"SELECT action FROM Journal WHERE username='{currentUser}'"
