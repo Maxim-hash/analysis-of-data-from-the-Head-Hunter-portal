@@ -10,6 +10,24 @@ class MainWindow(Tk, Singleton):
         super().__init__() 
         self.title("HeadHunder client")
         self.geometry("1280x720")
+        
+        ttk.Style().configure(
+            ".",
+            font="helvetica 14",    # шрифт
+            foreground="#004D40",   # цвет текста
+            padding=10,             # отступы
+            height=20,
+        )
+        ttk.Style().configure(
+            "Treeview",
+            foreground="#333",   # цвет текста
+            rowheight=45,
+            padding=0,
+        )
+        ttk.Style().configure(
+            "TCombobox",
+            width=100
+        )
         self.sub_forms = []
         self.makeUI(token)
 

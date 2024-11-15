@@ -24,7 +24,7 @@ class SearchFormUI:
 
     def __init__(self, master, token) -> None:
         self.token = token
-        self.root = Frame(master=master)
+        self.root = ttk.Frame(master=master)
         self.vacancy_name_field = VacancyNameField(self.root)
         self.region_field = RegionField(self.root)
         self.experience_field = ExperienceField(self.root)
@@ -37,7 +37,7 @@ class SearchFormUI:
         self.region_field.draw()
         self.experience_field.draw()
 
-        Button(self.root, text="Поиск", command=self.on_button_clicked).pack(pady=10)
+        ttk.Button(self.root, text="Поиск", command=self.on_button_clicked).pack(pady=10)
 
     def on_button_clicked(self) -> None:
         self.data = {

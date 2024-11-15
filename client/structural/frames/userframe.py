@@ -1,4 +1,4 @@
-from tkinter import W
+from tkinter import W, ttk
 from tkinter import Frame, Label, Scrollbar
 from structural.config import secret_key
 from structural.src.tree import JournalTree
@@ -14,11 +14,11 @@ class UserFrame(Frame):
         self.search = search
 
     def makeUI(self, data):
-        Label(self.master, text="Пользовательская панель", bg='white').pack()
+        ttk.Label(self.master, text="Пользовательская панель").pack()
         login = self.params["login"]
-        Label(self.master, text=login, bg="white").pack(anchor=W)
+        ttk.Label(self.master, text=login).pack(anchor=W)
 
-        container = Frame(self.master)
+        container = ttk.Frame(self.master)
         container.pack(expand=False, fill="both")
 
         tree = JournalTree(container)

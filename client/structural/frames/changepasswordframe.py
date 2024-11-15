@@ -12,15 +12,15 @@ class ChangePasswordFrame(Frame):
         self.search = search
 
     def makeUI(self):
-        Label(self.master, text="Смена пароля").pack(side=TOP)
-        Label(self.master, text="Введите новый пароль").pack(anchor=NW)
+        ttk.Label(self.master, text="Смена пароля").pack(side=TOP)
+        ttk.Label(self.master, text="Введите новый пароль").pack(anchor=NW)
         self.entry_password1 = ttk.Entry(self.master, width=40, show="*")
         self.entry_password1.pack(padx=5, pady=5)
-        Label(self.master, text="Подтвердите пароль").pack(anchor=NW)
+        ttk.Label(self.master, text="Подтвердите пароль").pack(anchor=NW)
         self.entry_password2 = ttk.Entry(self.master, width=40, show="*")
         self.entry_password2.pack(padx=5, pady=5)
 
-        self.change_password_button = Button(self.master, text="Сменить пароль", command=self.change_password)
+        self.change_password_button = ttk.Button(self.master, text="Сменить пароль", command=self.change_password)
         self.change_password_button.pack()
 
     def change_password(self):

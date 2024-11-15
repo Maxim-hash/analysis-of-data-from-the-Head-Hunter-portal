@@ -1,3 +1,4 @@
+from tkinter import ttk
 from structural.mainwindow import MainWindow
 from structural.autorizationwindow import AutorizationWindow
 

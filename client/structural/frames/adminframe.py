@@ -1,4 +1,5 @@
 from tkinter import NE, messagebox, Button, Frame, Label, Scrollbar
+from tkinter import ttk
 from tkinter.ttk import Treeview
 
 from structural.src.tree import JournalTree, UserTree
@@ -11,20 +12,20 @@ class AdminFrame(Frame):
         self.search = search
 
     def makeUI(self, data):
-        Label(self.master, text="Панель Администратора", bg='white').pack()
+        ttk.Label(self.master, text="Панель Администратора").pack()
         
-        Button(self.master, text="Обновить базу данных", command=self.update_database).pack(anchor=NE)
+        ttk.Button(self.master, text="Обновить базу данных", command=self.update_database).pack(anchor=NE)
 
         journal_container = Frame(self.master, bg='white')
         journal_container.pack(expand=False, fill="both")
-        self.selected_user = Label(journal_container, bg='white')
-        self.selected_user_button = Button(journal_container, text="Заблокировать", command=self.ban_user)
+        self.selected_user = ttk.Label(journal_container)
+        self.selected_user_button = ttk.Button(journal_container, text="Заблокировать", command=self.ban_user)
         self.show_journal(journal_container, data)
 
         ban_list_container = Frame(self.master, bg='white')
         ban_list_container.pack(expand=False, fill="both")
-        self.selected_banned_user = Label(ban_list_container, bg='white')
-        self.selected_banned_user_button = Button(ban_list_container, text="Разблокировать", command=self.unban_user)
+        self.selected_banned_user = ttk.Label(ban_list_container)
+        self.selected_banned_user_button = ttk.Button(ban_list_container, text="Разблокировать", command=self.unban_user)
         self.show_banned_users(ban_list_container)
 
     def unban_user(self):
@@ -35,7 +36,7 @@ class AdminFrame(Frame):
         self.search(self.token, "update", database="")
 
     def show_banned_users(self, container):
-        Label(container, text="Список заблокированных пользователей", bg='white').pack()
+        ttk.Label(container, text="Список заблокированных пользователей", bg='white').pack()
         data = self.search(self.token, user="", status=3).data
 
         tree = UserTree(container)

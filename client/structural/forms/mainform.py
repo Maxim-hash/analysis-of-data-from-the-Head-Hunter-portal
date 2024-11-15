@@ -1,4 +1,4 @@
-from tkinter import BOTH, DISABLED, HORIZONTAL, NORMAL, PanedWindow
+from tkinter import BOTH, DISABLED, HORIZONTAL, NORMAL, PanedWindow, ttk
 from tkinter import Button, Frame, Label
 from structural.frames import *
 from structural.config import secret_key
@@ -40,14 +40,14 @@ class MainForm(Frame):
         self.change_password_frame = ChangePasswordFrame(self.display_frame, self.search_func, self.token)
 
         # Пример добавления элементов управления
-        Label(self.control_frame, text="Панель управления", bg='lightgray').pack(pady=10)
-        self.user_button = Button(self.control_frame, text="Пользовательская панель", state="disabled", command=self.show_initial_content)
+        ttk.Label(self.control_frame, text="Панель управления").pack(pady=10)
+        self.user_button = ttk.Button(self.control_frame, text="Пользовательская панель", state="disabled", command=self.show_initial_content)
         self.user_button.pack(pady=5, fill="x")
-        self.change_password_button = Button(self.control_frame, text="Сменить пароль", command=self.change_password)
+        self.change_password_button = ttk.Button(self.control_frame, text="Сменить пароль", command=self.change_password)
         
         # Добавление кнопки панели администратора
         if self.user_info.get('role') == 2:
-            self.admin_button = Button(self.control_frame, text="Панель администратора", command=self.show_administator_content)
+            self.admin_button = ttk.Button(self.control_frame, text="Панель администратора", command=self.show_administator_content)
             self.admin_button.pack(pady=10, fill="x")
 
         self.change_password_button.pack(pady=5, fill="x")
@@ -66,7 +66,8 @@ class MainForm(Frame):
     def show_initial_content(self):
         self.clear_display_frame()
         self.user_button.config(state=DISABLED)
-        self.admin_button.config(state=NORMAL)
+        if self.user_info.get('role') == 2:
+            self.admin_button.config(state=NORMAL)
         self.user_frame.update()
 
     def show_administator_content(self):
