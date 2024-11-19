@@ -1,7 +1,7 @@
 
 
 from model.src import API_Grabber
-from model.src.Orms import SalaryOrm, VacancyOrm
+from model.src.Orms import JournalOrm, SalaryOrm, VacancyOrm
 from model.src.database_handler import Database_handler
 from model.src.utils import get_salary
 
@@ -39,3 +39,15 @@ class VacancyRequestHandler(RequestHandler):
 
         return self.answer
     
+class JournalRequestHandler(RequestHandler):
+    def proccess(self, decoded_data):
+        result = self.db_handler.select(decoded_data, JournalOrm)
+        answer = {}
+        for i in result:
+            obj = {**(i.__dict__)}
+            obj.pop('_sa_instance_state', None)
+            answer[obj['id']] = obj.copy()
+            answer[obj['id']]["time"] = answer[obj['id']]["time"].isoformat() 
+            answer[obj['id']].pop("id", None)
+
+        return answer
