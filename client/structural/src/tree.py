@@ -11,7 +11,7 @@ class Tree(Treeview):
         if columns_size:
             self.set_heading_size(columns_size)
 
-        self.set_horizontal_scrollbar(container)
+        #self.set_horizontal_scrollbar(container)
         self.set_vertical_scrollbar(container)
 
     def set_heading_size(self,columns_name: List = [], column_size: List = []):

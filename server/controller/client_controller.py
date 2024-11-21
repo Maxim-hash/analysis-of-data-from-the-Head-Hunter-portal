@@ -12,7 +12,9 @@ class client_controller(controller):
         }
         model = ClientModel()
         needed_data = {key : value for key, value in data.items() if key != "action"}
+        
         if data['action'] == "auth": 
+            needed_data['ip'] = ip
             result = asyncio.run(model.auth(needed_data, ip))
         elif data['action'] == "login":
             result = asyncio.run(model.login(needed_data))

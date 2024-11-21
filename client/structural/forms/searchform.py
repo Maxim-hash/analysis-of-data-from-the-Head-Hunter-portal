@@ -65,7 +65,6 @@ class SearchForm(Singleton):
 
         self.ui = SearchFormUI(master, token)
         self.controller = SearchFormController(extension)
-
         self.ui.add_controller(self.controller)
 
         self.ui.showUI()

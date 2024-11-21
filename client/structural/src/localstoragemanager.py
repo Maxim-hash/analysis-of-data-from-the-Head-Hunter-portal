@@ -1,4 +1,4 @@
-from localstorage import LocalStorage
+from structural.src.localstorage import LocalStorage
 #from creational.singleton import Singleton
 
 class Singleton(object):
@@ -55,16 +55,16 @@ class LocalStorageManager(Singleton):
             return entries
         
     def cleanTables(self):
-        self.database.deleteFromTables()
+        self.database.cleanTables()
 
     
 
-lsm = LocalStorageManager()
-lsm.cleanTables()
-username = "ALLA"
-lsm.createUser(username, "dqfwqwfg")
-lsm.set_current_user(username)
-for entry in lsm.getEntries():
-    print(entry)
+#lsm = LocalStorageManager()
+#lsm.cleanTables()
+#username = "ALLA"
+#lsm.createUser(username, "uergipeqrgpeqrig")
+#lsm.set_current_user(username)
+#for entry in lsm.getEntries():
+    #print(entry)
 
-print(lsm.getUsers())
+#print(lsm.getUsers())

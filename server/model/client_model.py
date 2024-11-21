@@ -1,6 +1,7 @@
 import asyncio
 import jwt
 import json
+from model.src.dataService import DataService
 from model.src.database_handler import *
 from controller.api_controller import *
 from model.src.API_Grabber import *
@@ -11,10 +12,10 @@ from model.src.utils import get_salary
 
 class ClientModel():
     def __init__(self) -> None:
-        self.return_data = {
-            "status" : None,
-            "data" : None
-        }
+        db_handler = Database_handler()
+        api_grabber = API_Grabber()
+        data_service = DataService(db_handler, api_grabber)
+        self.return_data = {}
         
     def handle(self, data):
         return(f"{data} WAS HANDELED")
