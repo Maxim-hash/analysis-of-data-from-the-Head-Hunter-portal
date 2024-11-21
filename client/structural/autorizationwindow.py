@@ -69,7 +69,7 @@ class AutorizationWindow(Tk, Singleton):
         message = builder.build()
         self.data = authorization(message)
 
-        if "200" in self.data:
+        if self.data["status"] == "Access":
             self.on_success()
         else:
             self.errorLabel['text'] = "Такой пользователь уже зарегистрирован"
@@ -90,7 +90,7 @@ def authorization(message:str):
     except Exception as e:
         messagebox.showerror("Connection failed", f"{e}")
     except:
-        data = "202"
+        data = "Error"
         print("На сервере ведутся технические работы приносим свои извинение за предоставленные неудобства."
               "\nПопробуйте повторить попытку через пару минут")
     sock.close()

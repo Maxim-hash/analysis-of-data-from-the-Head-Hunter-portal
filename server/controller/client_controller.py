@@ -8,16 +8,17 @@ class client_controller(controller):
     def handle(ip, data: dict):
         converter = {
             "Access" : True,
-            "Denied" : False
+            "Denied" : False,
+            "Error" : False,
         }
         model = ClientModel()
         needed_data = {key : value for key, value in data.items() if key != "action"}
         
         if data['action'] == "auth": 
             needed_data['ip'] = ip
-            result = asyncio.run(model.auth(needed_data, ip))
+            result =asyncio.run( model.auth(needed_data))
         elif data['action'] == "login":
-            result = asyncio.run(model.login(needed_data))
+            result = asyncio.run(model.auth(needed_data))
         elif data['action'] == "get":
             result = model.get(needed_data)
         elif data["action"] == "update":

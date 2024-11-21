@@ -55,7 +55,7 @@ class VacancyRequestHandler(RequestHandler):
         postproccess_data = {}
         ids = [item.id for item in result]
         skills_data = self.api_grabber.get_skills_data(ids)
-        skills = {vacancy_id : {"key_skills" : [skill["name"] for skill in skills_data[vacancy_id]]} for vacancy_id in ids}
+        skills = {vacancy_id : {"key_skills" : [skill["name"] for skill in skills_data[vacancy_id]]} for vacancy_id in range(len(skills_data))}
 
         salary = []
         for item in result:
@@ -114,7 +114,7 @@ class LoginRequestHandler(RequestHandler):
             self.answer["data"] = 'User is Banned'
             return self.answer
 
-        if self.is_user_exists(user):
+        if not self.is_user_exists(user):
             self.answer["data"] = 'User is not registered'
             return self.answer
         

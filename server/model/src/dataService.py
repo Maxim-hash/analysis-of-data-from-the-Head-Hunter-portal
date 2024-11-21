@@ -32,15 +32,16 @@ class DataService:
                 "data": str(e)
             }
 
-    def auth(self, decoded_data):
-        try:
-            response = asyncio.run(self.request_controllers["auth"].handle_request(decoded_data))
-            return response
-        except ValueError as e:
-            return {
-                "status": "Error",
-                "data": str(e)
-            }
+    async def auth(self, decoded_data):
+        response = await self.request_controllers["auth"].handle_request(decoded_data)
+        return response
+        #try:
+            
+        #except ValueError as e:
+            #return {
+                #"status": "Error",
+                #"data": str(e)
+            #}
 
     def action(self, decoded_data):
         token = decoded_data["token"]
