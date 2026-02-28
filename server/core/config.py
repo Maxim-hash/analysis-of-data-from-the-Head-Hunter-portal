@@ -21,11 +21,16 @@ class Setting(BaseSettings):
     access_token_expire_minutes:int
 
     hh_base_url: str
-    hh_headers: str
     hh_api_key: str
 
     encoding: str
     debug: bool
+    app_name: str
+
+    def get_hh_headers(self):
+        return {
+            "User-Agent": self.app_name, "Authorization": f"Bearer {self.hh_api_key}"
+        }
 
     def async_database_url(self):
         return f"postgresql+asyncpg://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"

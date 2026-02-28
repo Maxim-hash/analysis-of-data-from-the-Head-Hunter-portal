@@ -4,6 +4,8 @@ from .role import Role
 from .rolePermission import RolePermission
 from .user import User
 from .userRole import UserRole
+from .hhParserState import HHParserState
+from .area import Area
 
 __all__ = [
     "Base",
@@ -12,4 +14,6 @@ __all__ = [
     "RolePermission",
     "User",
     "UserRole",
+    "HHParserState",
+    "Area",
 ]
