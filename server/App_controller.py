@@ -1,6 +1,6 @@
 import json
 import socket
-from config import port, max_users, encoding
+from server.core.config import port, max_users, encoding
 from controller.client_controller import client_controller
 from controller.api_controller import api_controller
 import asyncio

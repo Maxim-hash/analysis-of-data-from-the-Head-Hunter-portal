@@ -5,7 +5,7 @@ from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 import aiohttp
 import asyncio
-from config import HEADERS
+from server.core.config import HEADERS
 
 class API_Grabber():
     def __init__(self, per_page=100):

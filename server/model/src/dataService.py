@@ -1,6 +1,6 @@
 import asyncio
 import jwt
-from config import secret_key
+from server.core.config import secret_key
 from model.src.requestController import ActionRequestController, AuthRequestController, DataRequestController
 
 

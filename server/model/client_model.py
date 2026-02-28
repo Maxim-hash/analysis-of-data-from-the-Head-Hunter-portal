@@ -5,7 +5,7 @@ from model.src.dataService import DataService
 from model.src.database_handler import *
 from controller.api_controller import *
 from model.src.API_Grabber import *
-from config import secret_key
+from server.core.config import secret_key
 from datetime import datetime
 
 from model.src.utils import get_salary

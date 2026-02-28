@@ -3,7 +3,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import sessionmaker
-from config import settings
+from server.core.config import settings
 from model.src.BaseOrm import Base
 from model.src.Orms import *
 from model.src.Query_Builder import *

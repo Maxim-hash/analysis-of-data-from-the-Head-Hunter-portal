@@ -6,7 +6,7 @@ from model.src.API_Grabber import *
 from model.src.Orms import JournalOrm, SalaryOrm, UserOrm, VacancyOrm
 from model.src.database_handler import Database_handler
 from model.src.utils import get_salary
-from config import secret_key
+from server.core.config import secret_key
 from controller import api_controller
 
 
