@@ -1,9 +1,6 @@
 __pycache__
 
-config.py
-test.py
-
-venv/
+.venv
 dist/
 build/
 
@@ -11,10 +8,10 @@ build/
 
 *.spec
 
-*.txt
-
 *.exe
 
 *.pyc 
 
 *.db
+
+*.env
