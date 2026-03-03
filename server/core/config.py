@@ -15,6 +15,7 @@ class Setting(BaseSettings):
     db_port: str
     db_host: str
     db_name: str
+    time_interval_minutes: int
 
     secret_key: str
     algorithm: str
@@ -22,6 +23,8 @@ class Setting(BaseSettings):
 
     hh_base_url: str
     hh_api_key: str
+    parser_interval_seconds: int
+    per_page: int
 
     encoding: str
     debug: bool

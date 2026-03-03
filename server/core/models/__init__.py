@@ -6,6 +6,9 @@ from .user import User
 from .userRole import UserRole
 from .hhParserState import HHParserState
 from .area import Area
+from .employer import Employer
+from .salary import Salary
+from .vacancy import Vacancy
 
 __all__ = [
     "Base",
@@ -16,4 +19,7 @@ __all__ = [
     "UserRole",
     "HHParserState",
     "Area",
+    "Employer",
+    "Salary",
+    "Vacancy",
 ]
