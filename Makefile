@@ -21,18 +21,16 @@ worker-up:
 worker-down:
 	@docker compose down worker
 
-migrate: ## Применить все миграции (upgrade head)
+migrate: 
 	docker compose run --rm migrations alembic upgrade head
 
-migrate-up: migrate   # alias
-
-migrate-down: ## Откатить последнюю миграцию
+migrate-down:
 	docker compose run --rm migrations alembic downgrade -1
 
-migrate-down-all: ## Откатить все миграции
+migrate-down-all: 
 	docker compose run --rm migrations alembic downgrade base
 
-migrate-create: ## Создать новую миграцию
+migrate-create: 
 	@if [ -z "$(MSG)" ]; then \
 		echo "Ошибка: укажите MSG. Пример: make migrate-create MSG=\"add new field\""; \
 		exit 1; \
