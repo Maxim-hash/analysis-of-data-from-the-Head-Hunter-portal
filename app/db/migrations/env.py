@@ -5,8 +5,8 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from core.config import settings
-from db.base import Base
+from app.core.config import settings
+from app.db.base import Base
 from app.models import Area, Employer, HHParserState, Permission, Role, RolePermission, Salary, User, UserRole, Vacancy
 
 # this is the Alembic Config object, which provides
