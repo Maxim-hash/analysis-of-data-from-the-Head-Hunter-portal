@@ -1,7 +1,7 @@
 from sqlalchemy import ForeignKey
 
 from app.db.base import Base, intpk, str_2048
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 class Vacancy(Base):
     __tablename__ = "vacancy"
@@ -17,6 +17,8 @@ class Vacancy(Base):
     exp: Mapped[str_2048]
     empoyment: Mapped[str_2048]
     employers_name: Mapped[str_2048]
+
+    salary: Mapped["Salary | None"] = relationship(back_populates="vacancy")
 
     def __eq__(self, other):
         if not isinstance(other, Vacancy):

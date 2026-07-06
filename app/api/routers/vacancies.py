@@ -5,6 +5,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi import Request
+from sqlalchemy.orm import selectinload
 
 from app.core.session import get_session
 from app.models import Vacancy
@@ -23,7 +24,14 @@ async def list_vacancies(
 
     offset = (page - 1) * limit
 
-    stmt = select(Vacancy).offset(offset).limit(limit)
+    stmt = (
+        select(Vacancy)
+        .options(
+            selectinload(Vacancy.salary),
+        )
+        .offset(offset)
+        .limit(limit)
+    )
     result = await session.execute(stmt)
     vacancies = result.scalars().all()
 

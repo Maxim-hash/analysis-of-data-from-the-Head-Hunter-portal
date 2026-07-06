@@ -4,7 +4,7 @@ export
 export PROJECT_ROOT = $(shell pwd)
 
 env-up:
-	@docker compose up -d analisys-postgres
+	@docker compose up -d --build analisys-postgres
 
 env-down:
 	@docker compose down -v analisys-postgres
