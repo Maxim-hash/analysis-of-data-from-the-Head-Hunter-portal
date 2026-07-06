@@ -7,16 +7,16 @@ env-up:
 	@docker compose up -d analisys-postgres
 
 env-down:
-	@docker compose down analisys-postgres
+	@docker compose down -v analisys-postgres
 
 app-up:
-	@docker compose up -d app
+	@docker compose up -d --build app
 
 app-down:
 	@docker compose down app
 
 worker-up:
-	@docker compose up -d worker
+	@docker compose up -d --build worker
 
 worker-down:
 	@docker compose down worker
@@ -39,6 +39,5 @@ migrate-create:
 
 down: worker-down app-down env-down
 	
-
 up: env-up app-up worker-up
 

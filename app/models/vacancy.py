@@ -8,7 +8,7 @@ class Vacancy(Base):
 
     id: Mapped[intpk]
     name: Mapped[str_2048]
-    area_id: Mapped[int] = mapped_column(ForeignKey("area.id", ondelete="CASCADE"))
+    area_id: Mapped[int] = mapped_column(ForeignKey("hh.area.id", ondelete="CASCADE"))
     publishied_at: Mapped[str_2048]
     requirement: Mapped[str_2048 | None]
     responsobility: Mapped[str_2048 | None]
