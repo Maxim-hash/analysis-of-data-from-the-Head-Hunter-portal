@@ -1,0 +1,46 @@
+services:
+  analisys-postgres:
+    image: postgres:18.4-bookworm
+    container_name: analisys-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./out/pgdata:/var/lib/postgresql/
+
+  migrations:
+    build: .
+    container_name: hh_migrations
+    env_file:
+      - .env
+    depends_on:
+      - analisys-postgres
+    profiles: ["migrations"]
+    volumes:
+      - ./app:/app/app
+  
+  app:
+    build: .
+    container_name: hh_api
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "${HOST_PORT:-8000}:8000"
+    depends_on:
+      - analisys-postgres
+    command: python -m app.main
+
+  worker:
+    build: .
+    container_name: hh_worker
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - analisys-postgres
+    command: python -m worker.main

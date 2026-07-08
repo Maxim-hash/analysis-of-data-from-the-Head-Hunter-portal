@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Все вакансии{% endblock %}
+
+{% block content %}
+<h1>Список вакансий</h1>
+
+{% if vacancies %}
+    <ul>
+    {% for vacancy in vacancies %}
+        <li>
+            <h2>
+                <a href="{{ url_for('read_vacancy', vacancy_id=vacancy.id) }}">
+                    {{ vacancy.name }}
+                </a>
+            </h2>
+            <p><strong>Работодатель:</strong> {{ vacancy.employers_name }}</p>
+            <p><strong>Зарплата:</strong> 
+                {% if vacancy.salary %}
+                    от {{ vacancy.salary.s_from or 'не указана' }}
+                {% else %}
+                    не указана
+                {% endif %}
+            </p>
+            <p><strong>Опыт:</strong> {{ vacancy.exp }}</p>
+            <p><strong>Регион:</strong> {{ vacancy.area.name if vacancy.area else 'не указан' }}</p>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Вакансий пока нет.</p>
+{% endif %}
+
+{% if pagination and pagination.pages > 1 %}
+    <div class="pagination">
+        {% if pagination.prev_page %}
+            <a href="?page={{ pagination.prev_page }}">← Назад</a>
+        {% endif %}
+        <span>Страница {{ pagination.page }} из {{ pagination.pages }}</span>
+        {% if pagination.next_page %}
+            <a href="?page={{ pagination.next_page }}">Вперёд →</a>
+        {% endif %}
+    </div>
+{% endif %}
+{% endblock %}

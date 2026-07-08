@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}{{ vacancy.name }} — детали вакансии{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Главная</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('list_vacancies') }}">Вакансии</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ vacancy.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h1 class="h3 mb-0">{{ vacancy.name }}</h1>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <p><strong>Работодатель:</strong> {{ vacancy.employers_name or 'Не указан' }}</p>
+                    <p><strong>Регион:</strong> {{ vacancy.area.name if vacancy.area else 'Не указан' }}</p>
+                    <p><strong>Дата публикации:</strong> {{ vacancy.published_at|default('Не указана', true) }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Зарплата:</strong>
+                        {% if vacancy.salary %}
+                            {% if vacancy.salary.s_from %}от {{ vacancy.salary.s_from }}{% endif %}
+                            {% if vacancy.salary.s_to %}до {{ vacancy.salary.s_to }}{% endif %}
+                            {{ vacancy.salary.currency or '' }}
+                            {% if vacancy.salary.gross %}(гросс){% endif %}
+                        {% else %}
+                            Не указана
+                        {% endif %}
+                    </p>
+                    <p><strong>Опыт работы:</strong> {{ vacancy.exp or 'Не указан' }}</p>
+                    <p><strong>График:</strong> {{ vacancy.schedule or 'Не указан' }}</p>
+                    <p><strong>Тип занятости:</strong> {{ vacancy.employment or 'Не указан' }}</p>
+                </div>
+            </div>
+
+            <hr>
+
+            <h5>Требования</h5>
+            <p>{{ vacancy.requirement or 'Не указаны' }}</p>
+
+            <h5>Обязанности</h5>
+            <p>{{ vacancy.responsibility or 'Не указаны' }}</p>
+
+            <h5>Профессиональные роли</h5>
+            <p>{{ vacancy.prof_roles or 'Не указаны' }}</p>
+
+            <div class="mt-4">
+                <a href="{{ url_for('list_vacancies') }}" class="btn btn-secondary">← Назад к списку</a>
+                <!-- можно добавить кнопку "Перейти на HH" если есть ссылка -->
+                {% if vacancy.hh_url %}
+                    <a href="{{ vacancy.hh_url }}" target="_blank" class="btn btn-outline-primary">Смотреть на HH</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
