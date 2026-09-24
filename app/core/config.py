@@ -40,6 +40,12 @@ class Setting(BaseSettings):
     
     def sync_database_url(self):
         return f"postgresql://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
+    
+    def sync_database_url_test(self):
+        return f"postgresql://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}_test"
+
+    def async_database_url_test(self):
+        return f"postgresql+asyncpg://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}_test"
 
     model_config = SettingsConfigDict(
         env_file=".env",              # Загрузка из .env в корне

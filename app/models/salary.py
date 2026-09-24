@@ -1,19 +1,25 @@
+from typing import TYPE_CHECKING
+
 from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, intpk, str_2048
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+if TYPE_CHECKING:
+    from .vacancy import Vacancy
+
 
 class Salary(Base):
     __tablename__ = "salary"
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True) 
-    vacancy_id : Mapped[int] = mapped_column(ForeignKey("hh.vacancy.id", ondelete="CASCADE"), nullable=False)
-    s_from: Mapped[int | None] 
-    s_to: Mapped[int | None] 
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    vacancy_id: Mapped[int] = mapped_column(ForeignKey("hh.vacancy.id", ondelete="CASCADE"), nullable=False)
+    s_from: Mapped[int | None]
+    s_to: Mapped[int | None]
     currency: Mapped[str_2048 | None]
     gross: Mapped[bool | None]
 
-    vacancy: Mapped["Vacancy"] = relationship(back_populates="salary")
+    vacancy: Mapped["Vacancy"] = relationship("Vacancy", back_populates="salary")
 
     def __eq__(self, other):
         if not isinstance(other, Salary):

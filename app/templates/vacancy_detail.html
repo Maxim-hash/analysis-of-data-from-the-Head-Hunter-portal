@@ -21,7 +21,7 @@
                 <div class="col-md-6">
                     <p><strong>Работодатель:</strong> {{ vacancy.employers_name or 'Не указан' }}</p>
                     <p><strong>Регион:</strong> {{ vacancy.area.name if vacancy.area else 'Не указан' }}</p>
-                    <p><strong>Дата публикации:</strong> {{ vacancy.published_at|default('Не указана', true) }}</p>
+                    <p><strong>Дата публикации:</strong> {{ vacancy.publishied_at|default('Не указана', true) }}</p>
                 </div>
                 <div class="col-md-6">
                     <p><strong>Зарплата:</strong>
@@ -36,7 +36,7 @@
                     </p>
                     <p><strong>Опыт работы:</strong> {{ vacancy.exp or 'Не указан' }}</p>
                     <p><strong>График:</strong> {{ vacancy.schedule or 'Не указан' }}</p>
-                    <p><strong>Тип занятости:</strong> {{ vacancy.employment or 'Не указан' }}</p>
+                    <p><strong>Тип занятости:</strong> {{ vacancy.empoyment or 'Не указан' }}</p>
                 </div>
             </div>
 
@@ -46,7 +46,7 @@
             <p>{{ vacancy.requirement or 'Не указаны' }}</p>
 
             <h5>Обязанности</h5>
-            <p>{{ vacancy.responsibility or 'Не указаны' }}</p>
+            <p>{{ vacancy.responsobility or 'Не указаны' }}</p>
 
             <h5>Профессиональные роли</h5>
             <p>{{ vacancy.prof_roles or 'Не указаны' }}</p>

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
@@ -8,10 +10,11 @@ import uvicorn
 
 from app.api.routers import role, vacancies
 
+BASE_DIR = Path(__file__).resolve().parent
 app = FastAPI(title="PZ-2 HeadHunter API", debug=settings.debug)
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="app/templates")
+app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
+templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
 app.include_router(role.router)
 app.include_router(vacancies.router)

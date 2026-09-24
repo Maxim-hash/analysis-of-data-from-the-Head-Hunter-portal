@@ -1,0 +1,2939 @@
+--- FILE: alembic.ini
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/alembic.ini
+---
+# A generic, single database configuration.
+
+[alembic]
+# path to migration scripts.
+# this is typically a path given in POSIX (e.g. forward slashes)
+# format, relative to the token %(here)s which refers to the location of this
+# ini file
+script_location = app/db/migrations
+version_locations = %(script_location)s/versions
+
+# template used to generate migration file names; The default value is %%(rev)s_%%(slug)s
+# Uncomment the line below if you want the files to be prepended with date and time
+# see https://alembic.sqlalchemy.org/en/latest/tutorial.html#editing-the-ini-file
+# for all available tokens
+# file_template = %%(year)d_%%(month).2d_%%(day).2d_%%(hour).2d%%(minute).2d-%%(rev)s_%%(slug)s
+# Or organize into date-based subdirectories (requires recursive_version_locations = true)
+# file_template = %%(year)d/%%(month).2d/%%(day).2d_%%(hour).2d%%(minute).2d_%%(second).2d_%%(rev)s_%%(slug)s
+
+# sys.path path, will be prepended to sys.path if present.
+# defaults to the current working directory.  for multiple paths, the path separator
+# is defined by "path_separator" below.
+prepend_sys_path = .
+
+
+# timezone to use when rendering the date within the migration file
+# as well as the filename.
+# If specified, requires the tzdata library which can be installed by adding
+# `alembic[tz]` to the pip requirements.
+# string value is passed to ZoneInfo()
+# leave blank for localtime
+# timezone =
+
+# max length of characters to apply to the "slug" field
+# truncate_slug_length = 40
+
+# set to 'true' to run the environment during
+# the 'revision' command, regardless of autogenerate
+# revision_environment = false
+
+# set to 'true' to allow .pyc and .pyo files without
+# a source .py file to be detected as revisions in the
+# versions/ directory
+# sourceless = false
+
+# version location specification; This defaults
+# to <script_location>/versions.  When using multiple version
+# directories, initial revisions must be specified with --version-path.
+# The path separator used here should be the separator specified by "path_separator"
+# below.
+# version_locations = %(here)s/bar:%(here)s/bat:%(here)s/alembic/versions
+
+# path_separator; This indicates what character is used to split lists of file
+# paths, including version_locations and prepend_sys_path within configparser
+# files such as alembic.ini.
+# The default rendered in new alembic.ini files is "os", which uses os.pathsep
+# to provide os-dependent path splitting.
+#
+# Note that in order to support legacy alembic.ini files, this default does NOT
+# take place if path_separator is not present in alembic.ini.  If this
+# option is omitted entirely, fallback logic is as follows:
+#
+# 1. Parsing of the version_locations option falls back to using the legacy
+#    "version_path_separator" key, which if absent then falls back to the legacy
+#    behavior of splitting on spaces and/or commas.
+# 2. Parsing of the prepend_sys_path option falls back to the legacy
+#    behavior of splitting on spaces, commas, or colons.
+#
+# Valid values for path_separator are:
+#
+# path_separator = :
+# path_separator = ;
+# path_separator = space
+# path_separator = newline
+#
+# Use os.pathsep. Default configuration used for new projects.
+path_separator = os
+
+# set to 'true' to search source files recursively
+# in each "version_locations" directory
+# new in Alembic version 1.10
+# recursive_version_locations = false
+
+# the output encoding used when revision files
+# are written from script.py.mako
+# output_encoding = utf-8
+
+# database URL.  This is consumed by the user-maintained env.py script only.
+# other means of configuring database URLs may be customized within the env.py
+# file.
+sqlalchemy.url = driver://user:pass@localhost/dbname
+
+
+[post_write_hooks]
+# post_write_hooks defines scripts or Python functions that are run
+# on newly generated revision scripts.  See the documentation for further
+# detail and examples
+
+# format using "black" - use the console_scripts runner, against the "black" entrypoint
+# hooks = black
+# black.type = console_scripts
+# black.entrypoint = black
+# black.options = -l 79 REVISION_SCRIPT_FILENAME
+
+# lint with attempts to fix using "ruff" - use the module runner, against the "ruff" module
+# hooks = ruff
+# ruff.type = module
+# ruff.module = ruff
+# ruff.options = check --fix REVISION_SCRIPT_FILENAME
+
+# Alternatively, use the exec runner to execute a binary found on your PATH
+# hooks = ruff
+# ruff.type = exec
+# ruff.executable = ruff
+# ruff.options = check --fix REVISION_SCRIPT_FILENAME
+
+# Logging configuration.  This is also consumed by the user-maintained
+# env.py script only.
+[loggers]
+keys = root,sqlalchemy,alembic
+
+[handlers]
+keys = console
+
+[formatters]
+keys = generic
+
+[logger_root]
+level = WARNING
+handlers = console
+qualname =
+
+[logger_sqlalchemy]
+level = WARNING
+handlers =
+qualname = sqlalchemy.engine
+
+[logger_alembic]
+level = INFO
+handlers =
+qualname = alembic
+
+[handler_console]
+class = StreamHandler
+args = (sys.stderr,)
+level = NOTSET
+formatter = generic
+
+[formatter_generic]
+format = %(levelname)-5.5s [%(name)s] %(message)s
+datefmt = %H:%M:%S
+
+
+
+--- FILE: app/__init__.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/__init__.py
+---
+
+
+
+--- FILE: app/api/deps.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/api/deps.py
+---
+
+
+
+--- FILE: app/api/routers/__init__.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/api/routers/__init__.py
+---
+
+
+
+--- FILE: app/api/routers/role.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/api/routers/role.py
+---
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+
+from app.core.session import get_session
+from app.models import Role
+
+router = APIRouter(prefix="/roles", tags=["roles"])
+
+@router.get("/")
+async def list_roles(session: AsyncSession = Depends(get_session)):
+    stmt = select(Role)
+    result = await session.execute(stmt)
+    roles = result.scalars().all()
+    return [{"id": r.id, "name": r.name} for r in roles]
+
+
+--- FILE: app/api/routers/vacancies.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/api/routers/vacancies.py
+---
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import func, select
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from fastapi import Request
+from sqlalchemy.orm import selectinload
+
+from app.core.session import get_session
+from app.models import Vacancy
+
+router = APIRouter(prefix="/vacancies", tags=["vacancies"])
+
+templates = Jinja2Templates(directory="app/templates")
+
+@router.get("/", response_class=HTMLResponse)
+async def list_vacancies(
+    request: Request,
+    session: AsyncSession = Depends(get_session),
+    page: int = Query(1, ge=1),
+    limit: int = Query(20, ge=1, le=100)
+):
+
+    offset = (page - 1) * limit
+
+    stmt = (
+        select(Vacancy)
+        .options(
+            selectinload(Vacancy.salary),
+        )
+        .offset(offset)
+        .limit(limit)
+    )
+    result = await session.execute(stmt)
+    vacancies = result.scalars().all()
+
+    count_stmt = select(func.count()).select_from(Vacancy)
+    total = await session.scalar(count_stmt)
+    pages = (total + limit - 1) // limit
+
+    return templates.TemplateResponse(
+        "vacancies.html",
+        {
+            "request": request,
+            "vacancies": vacancies,
+            "pagination": {
+                "page": page,
+                "pages": pages,
+                "prev_page": page - 1 if page > 1 else None,
+                "next_page": page + 1 if page < pages else None
+            }
+        }
+    )
+
+@router.get("/{vacancy_id}", response_class=HTMLResponse, name="read_vacancy")
+async def read_vacancy(
+    request: Request,
+    vacancy_id: int,
+    session: AsyncSession = Depends(get_session),
+):
+    stmt = select(Vacancy).where(Vacancy.id == vacancy_id)
+    result = await session.execute(stmt)
+    vacancy = result.scalar_one_or_none()
+    if not vacancy: 
+        pass
+    return templates.TemplateResponse(
+        "vacancy_detail.html",
+        {
+            "request": request,
+            "vacancy": vacancy
+        }
+    )
+
+
+--- FILE: app/core/__init__.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/core/__init__.py
+---
+
+
+
+--- FILE: app/core/config.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/core/config.py
+---
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing import Dict, Any
+import os
+from dotenv import load_dotenv  # Опционально, fallback
+
+load_dotenv() 
+
+class Setting(BaseSettings):
+    host: str
+    port: int
+    max_users: int
+
+    db_user: str
+    db_password: str
+    db_port: str
+    db_host: str
+    db_name: str
+    time_interval_minutes: int
+
+    secret_key: str
+    algorithm: str
+    access_token_expire_minutes:int
+
+    hh_base_url: str
+    hh_api_key: str
+    parser_interval_seconds: int
+    per_page: int
+
+    encoding: str
+    debug: bool
+    app_name: str
+
+    def get_hh_headers(self):
+        return {
+            "User-Agent": self.app_name, "Authorization": f"Bearer {self.hh_api_key}"
+        }
+
+    def async_database_url(self):
+        return f"postgresql+asyncpg://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
+    
+    def sync_database_url(self):
+        return f"postgresql://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
+    
+    def sync_database_url_test(self):
+        return f"postgresql://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}_test"
+
+    def async_database_url_test(self):
+        return f"postgresql+asyncpg://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}_test"
+
+    model_config = SettingsConfigDict(
+        env_file=".env",              # Загрузка из .env в корне
+        env_file_encoding="utf-8",    # Кодировка
+        env_ignore_empty=True,        # Пустые vars = default
+        extra="ignore",               # Лишние vars игнор
+        case_sensitive=False          # python -> PYTHON_HOST
+    )
+
+settings = Setting()
+
+
+--- FILE: app/core/hhClient.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/core/hhClient.py
+---
+import httpx
+from app.core.config import settings
+
+class hhClient():
+    def __init__(self):
+        self.client = httpx.Client(
+            base_url=settings.hh_base_url,
+            headers=settings.get_hh_headers(),
+        )
+
+    def fetch_vacancies(self, params: dict):
+        resp = self.client.get("/vacancies", params=params)
+        resp.raise_for_status()
+        return resp.json()
+    
+    def fetch_area(self):
+        resp = self.client.get("/areas")
+        resp.raise_for_status()
+        return resp.json()
+
+
+--- FILE: app/core/session.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/core/session.py
+---
+from typing import AsyncGenerator
+
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from .config import settings
+
+engine = create_async_engine(settings.async_database_url(), echo=True)
+AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
+
+async def get_session() -> AsyncGenerator[AsyncSession, None]:
+    async with AsyncSessionLocal() as session:
+        yield session
+
+
+--- FILE: app/db/base.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/db/base.py
+---
+from typing import Annotated
+
+from sqlalchemy import String
+from sqlalchemy.orm import DeclarativeBase, mapped_column
+
+str_2048 = Annotated[str, 2048]
+intpk = Annotated[int, mapped_column(primary_key=True)]
+
+class Base(DeclarativeBase):
+    __abstract__ = True
+    __table_args__ = {'schema': "hh"}
+    type_annotation_map = {
+        str_2048: String(2048)
+    }
+    pass
+
+
+--- FILE: app/db/migrations/env.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/db/migrations/env.py
+---
+from logging.config import fileConfig
+
+from sqlalchemy import engine_from_config
+from sqlalchemy import pool
+
+from alembic import context
+
+from app.core.config import settings
+from app.db.base import Base
+from app.models import *
+
+# this is the Alembic Config object, which provides
+# access to the values within the .ini file in use.
+config = context.config
+
+url = settings.sync_database_url()
+
+if url:
+    config.set_main_option("sqlalchemy.url", url)
+    print(url)
+
+# Interpret the config file for Python logging.
+# This line sets up loggers basically.
+if config.config_file_name is not None:
+    fileConfig(config.config_file_name)
+
+# add your model's MetaData object here
+# for 'autogenerate' support
+# from myapp import mymodel
+# target_metadata = mymodel.Base.metadata
+target_metadata = Base.metadata
+
+# other values from the config, defined by the needs of env.py,
+# can be acquired:
+# my_important_option = config.get_main_option("my_important_option")
+# ... etc.
+
+
+def run_migrations_offline() -> None:
+    """Run migrations in 'offline' mode.
+
+    This configures the context with just a URL
+    and not an Engine, though an Engine is acceptable
+    here as well.  By skipping the Engine creation
+    we don't even need a DBAPI to be available.
+
+    Calls to context.execute() here emit the given string to the
+    script output.
+
+    """
+    url = config.get_main_option("sqlalchemy.url")
+    context.configure(
+        url=url,
+        target_metadata=target_metadata,
+        include_schemas=True,
+        literal_binds=True,
+        dialect_opts={"paramstyle": "named"},
+    )
+
+    with context.begin_transaction():
+        context.run_migrations()
+
+
+def run_migrations_online() -> None:
+    """Run migrations in 'online' mode.
+
+    In this scenario we need to create an Engine
+    and associate a connection with the context.
+
+    """
+    connectable = engine_from_config(
+        config.get_section(config.config_ini_section, {}),
+        prefix="sqlalchemy.",
+        poolclass=pool.NullPool,
+    )
+
+    with connectable.connect() as connection:
+        context.configure(
+            connection=connection, 
+            target_metadata=target_metadata,
+            include_schemas=True
+        )
+
+        with context.begin_transaction():
+            context.run_migrations()
+
+
+if context.is_offline_mode():
+    run_migrations_offline()
+else:
+    run_migrations_online()
+
+
+
+--- FILE: app/db/migrations/versions/275d497f6b4a_init.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/db/migrations/versions/275d497f6b4a_init.py
+---
+"""init
+
+Revision ID: 275d497f6b4a
+Revises: 
+Create Date: 2026-07-05 13:13:10.387946
+
+"""
+from typing import Sequence, Union
+
+from alembic import op
+import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
+
+# revision identifiers, used by Alembic.
+revision: str = '275d497f6b4a'
+down_revision: Union[str, Sequence[str], None] = None
+branch_labels: Union[str, Sequence[str], None] = None
+depends_on: Union[str, Sequence[str], None] = None
+
+
+def upgrade() -> None:
+    """Upgrade schema."""
+    op.execute("CREATE SCHEMA IF NOT EXISTS hh")
+    # ### commands auto generated by Alembic - please adjust! ###   
+    op.create_table('area',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('parent_id', sa.Integer(), nullable=True),
+    sa.Column('name', sa.String(), nullable=False),
+    sa.PrimaryKeyConstraint('id'),
+    schema='hh'
+    )
+    op.create_table('employer',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(), nullable=False),
+    sa.Column('accredited_it_employer', sa.Boolean(), nullable=False),
+    sa.Column('trusted', sa.Boolean(), nullable=False),
+    sa.PrimaryKeyConstraint('name'),
+    schema='hh'
+    )
+    op.create_table('hh_parse_state',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('mode', sa.String(), nullable=False),
+    sa.Column('date_from', sa.DateTime(), nullable=False),
+    sa.Column('date_to', sa.DateTime(), nullable=False),
+    sa.Column('per_page', sa.Integer(), nullable=False),
+    sa.Column('page', sa.Integer(), nullable=False),
+    sa.Column('done', sa.Boolean(), nullable=False),
+    sa.PrimaryKeyConstraint('id'),
+    schema='hh'
+    )
+    op.create_table('permission',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(), nullable=False),
+    sa.Column('description', sa.String(length=2048), nullable=True),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('name'),
+    schema='hh'
+    )
+    op.create_table('role',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(), nullable=False),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('name'),
+    schema='hh'
+    )
+    op.create_table('salary',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('s_from', sa.Integer(), nullable=True),
+    sa.Column('s_to', sa.Integer(), nullable=True),
+    sa.Column('currency', sa.String(length=2048), nullable=True),
+    sa.Column('gross', sa.Boolean(), nullable=True),
+    sa.PrimaryKeyConstraint('id'),
+    schema='hh'
+    )
+    op.create_table('user',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('login', sa.String(), nullable=False),
+    sa.Column('password', sa.String(), nullable=False),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('login'),
+    schema='hh'
+    )
+    op.create_table('role_permission',
+    sa.Column('permission_id', sa.Integer(), nullable=False),
+    sa.Column('role_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['permission_id'], ['hh.permission.id'], ),
+    sa.ForeignKeyConstraint(['role_id'], ['hh.role.id'], ),
+    sa.PrimaryKeyConstraint('permission_id', 'role_id'),
+    schema='hh'
+    )
+    op.create_table('user_role',
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('role_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['role_id'], ['hh.role.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['hh.user.id'], ),
+    sa.PrimaryKeyConstraint('user_id', 'role_id'),
+    schema='hh'
+    )
+    op.create_table('vacancy',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(length=2048), nullable=False),
+    sa.Column('area_id', sa.Integer(), nullable=False),
+    sa.Column('publishied_at', sa.String(length=2048), nullable=False),
+    sa.Column('requirement', sa.String(length=2048), nullable=True),
+    sa.Column('responsobility', sa.String(length=2048), nullable=True),
+    sa.Column('schedule', sa.String(length=2048), nullable=False),
+    sa.Column('prof_roles', sa.String(length=2048), nullable=False),
+    sa.Column('exp', sa.String(length=2048), nullable=False),
+    sa.Column('empoyment', sa.String(length=2048), nullable=False),
+    sa.Column('employers_name', sa.String(length=2048), nullable=False),
+    sa.ForeignKeyConstraint(['area_id'], ['hh.area.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id'),
+    schema='hh'
+    )
+
+    # ### end Alembic commands ###
+
+
+def downgrade() -> None:
+    """Downgrade schema."""
+    op.execute("DROP SCHEMA IF EXISTS hh CASCADE")
+    # ### commands auto generated by Alembic - please adjust! ###
+    
+    op.drop_table('vacancy', schema='hh')
+    op.drop_table('user_role', schema='hh')
+    op.drop_table('role_permission', schema='hh')
+    op.drop_table('user', schema='hh')
+    op.drop_table('salary', schema='hh')
+    op.drop_table('role', schema='hh')
+    op.drop_table('permission', schema='hh')
+    op.drop_table('hh_parse_state', schema='hh')
+    op.drop_table('employer', schema='hh')
+    op.drop_table('area', schema='hh')
+    # ### end Alembic commands ###
+
+
+
+--- FILE: app/db/migrations/versions/df3aec9504b6_rework_orm_models.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/db/migrations/versions/df3aec9504b6_rework_orm_models.py
+---
+"""Rework ORM models
+
+Revision ID: df3aec9504b6
+Revises: 275d497f6b4a
+Create Date: 2026-07-06 17:16:33.220099
+
+"""
+from typing import Sequence, Union
+
+from alembic import op
+import sqlalchemy as sa
+
+
+# revision identifiers, used by Alembic.
+revision: str = 'df3aec9504b6'
+down_revision: Union[str, Sequence[str], None] = '275d497f6b4a'
+branch_labels: Union[str, Sequence[str], None] = None
+depends_on: Union[str, Sequence[str], None] = None
+
+
+def upgrade() -> None:
+    """Upgrade schema."""
+    # ### commands auto generated by Alembic - please adjust! ###
+    op.add_column('salary', sa.Column('vacancy_id', sa.Integer(), nullable=True), schema='hh')
+    op.execute("UPDATE hh.salary SET vacancy_id=id")
+    op.alter_column('salary', 'vacancy_id', nullable=False, schema='hh')
+    op.create_foreign_key(None, 'salary', 'vacancy', ['vacancy_id'], ['id'], source_schema='hh', referent_schema='hh', ondelete='CASCADE')
+
+    op.execute("CREATE SEQUENCE IF NOT EXISTS hh.salary_id_seq")
+    op.execute("UPDATE hh.salary SET id = nextval('hh.salary_id_seq')")
+    op.execute("ALTER TABLE hh.salary ALTER COLUMN id SET DEFAULT nextval('hh.salary_id_seq')")
+    op.execute("SELECT setval('hh.salary_id_seq', (SELECT max(id) FROM hh.salary))")
+    # ### end Alembic commands ###
+
+
+def downgrade() -> None:
+    """Downgrade schema."""
+    # ### commands auto generated by Alembic - please adjust! ###
+    op.execute("ALTER TABLE hh.salary ALTER COLUMN id DROP DEFAULT")
+    op.execute("DROP SEQUENCE IF EXISTS hh.salary_id_seq")
+    op.drop_constraint('uq_salary_vacancy', 'salary', type_='unique', schema='hh')
+    op.drop_constraint('fk_salary_vacancy', 'salary', type_='foreignkey', schema='hh')
+    op.drop_column('salary', 'vacancy_id', schema='hh')
+    # ### end Alembic commands ###
+
+
+
+--- FILE: app/main.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/main.py
+---
+from pathlib import Path
+
+from fastapi import FastAPI, Request
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+
+from app.core.config import settings
+import uvicorn
+
+from app.api.routers import role, vacancies
+
+BASE_DIR = Path(__file__).resolve().parent
+app = FastAPI(title="PZ-2 HeadHunter API", debug=settings.debug)
+
+app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
+templates = Jinja2Templates(directory=BASE_DIR / "templates")
+
+app.include_router(role.router)
+app.include_router(vacancies.router)
+
+@app.get("/", response_class=HTMLResponse)
+async def root(request: Request):
+    return templates.TemplateResponse(
+        "base.html",
+        {
+            "request":request
+        }
+    )
+
+
+if __name__ == "__main__":
+    uvicorn.run("app.main:app", host=settings.host, port=settings.port, reload=settings.debug)
+
+
+--- FILE: app/models/__init__.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/models/__init__.py
+---
+from .permission import Permission
+from .role import Role
+from .rolePermission import RolePermission
+from .user import User
+from .userRole import UserRole
+from .hhParserState import HHParserState
+from .area import Area
+from .employer import Employer
+from .salary import Salary
+from .vacancy import Vacancy
+
+__all__ = [
+    "Permission",
+    "Role",
+    "RolePermission",
+    "User",
+    "UserRole",
+    "HHParserState",
+    "Area",
+    "Employer",
+    "Salary",
+    "Vacancy",
+]
+
+
+--- FILE: app/models/area.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/models/area.py
+---
+from app.db.base import Base, intpk
+from sqlalchemy.orm import Mapped
+
+class Area(Base):
+    __tablename__ = "area"
+    id: Mapped[intpk]
+    parent_id: Mapped[int | None]
+    name: Mapped[str]
+
+    def __eq__(self, other):
+        if not isinstance(other, Area):
+            return False
+        return (self.id == other.id and 
+                self.parent_id == other.parent_id and 
+                self.name == other.name)
+
+    def __hash__(self):
+        # Для примера можно использовать хэширование по id
+        return hash(self.id)
+
+
+--- FILE: app/models/employer.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/models/employer.py
+---
+from app.db.base import Base, intpk, str_2048
+from sqlalchemy.orm import Mapped, mapped_column
+
+class Employer(Base):
+    __tablename__ = "employer"
+    id: Mapped[int]
+    name: Mapped[str] = mapped_column(primary_key=True)
+    accredited_it_employer: Mapped[bool] 
+    trusted: Mapped[bool]
+
+    def __eq__(self, other):
+        if not isinstance(other, Employer):
+            return NotImplemented
+        return (self.name == other.name and
+                self.accredited_it_employer == other.accredited_it_employer and
+                self.trusted == other.trusted)
+
+    def __hash__(self):
+        return hash((self.name, self.accredited_it_employer, self.trusted))
+
+
+--- FILE: app/models/hhParserState.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/models/hhParserState.py
+---
+from datetime import datetime
+
+from app.db.base import Base, intpk
+from sqlalchemy.orm import Mapped, mapped_column
+
+class HHParserState(Base):
+    __tablename__ = "hh_parse_state"
+    id: Mapped[intpk]
+    mode: Mapped[str] = mapped_column(default="/vacancies")
+    date_from: Mapped[datetime]
+    date_to: Mapped[datetime]
+    per_page: Mapped[int]
+    page: Mapped[int]
+    done: Mapped[bool] = mapped_column(default=False)
+
+
+--- FILE: app/models/permission.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/models/permission.py
+---
+from typing import Annotated
+
+from app.db.base import Base, intpk, str_2048
+from sqlalchemy.orm import Mapped, mapped_column
+
+class Permission(Base):
+    __tablename__ = "permission"
+    id: Mapped[intpk]
+    name: Mapped[Annotated[str, 30]] = mapped_column(unique=True)
+    description: Mapped[str_2048 | None]
+
+
+--- FILE: app/models/role.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/models/role.py
+---
+from typing import Annotated
+
+from app.db.base import Base, intpk, str_2048
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+class Role(Base):
+    __tablename__ = "role"
+    id: Mapped[intpk]
+    name: Mapped[Annotated[str, 30]] = mapped_column(unique=True)
+
+    users: Mapped[list["UserRole"]] = relationship(back_populates="role")
+
+
+--- FILE: app/models/rolePermission.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/models/rolePermission.py
+---
+from sqlalchemy import ForeignKey
+
+from app.db.base import Base
+from sqlalchemy.orm import Mapped, mapped_column
+
+class RolePermission(Base):
+    __tablename__ = "role_permission"
+    permission_id: Mapped[int] = mapped_column(ForeignKey("hh.permission.id"), primary_key=True)
+    role_id: Mapped[int] = mapped_column(ForeignKey("hh.role.id"), primary_key=True)
+    
+
+
+--- FILE: app/models/salary.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/models/salary.py
+---
+from sqlalchemy import ForeignKey
+
+from app.db.base import Base, intpk, str_2048
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+class Salary(Base):
+    __tablename__ = "salary"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True) 
+    vacancy_id : Mapped[int] = mapped_column(ForeignKey("hh.vacancy.id", ondelete="CASCADE"), nullable=False)
+    s_from: Mapped[int | None] 
+    s_to: Mapped[int | None] 
+    currency: Mapped[str_2048 | None]
+    gross: Mapped[bool | None]
+
+    vacancy: Mapped["Vacancy"] = relationship(back_populates="salary")
+
+    def __eq__(self, other):
+        if not isinstance(other, Salary):
+            return False
+        return (self.id == other.id and 
+                self.s_from == other.s_from and 
+                self.s_to == other.s_to and 
+                self.currency == other.currency and 
+                self.gross == other.gross)
+
+    def __hash__(self):
+        return hash(self.id)
+
+
+--- FILE: app/models/user.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/models/user.py
+---
+from app.db.base import Base, intpk
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+
+class User(Base):
+    __tablename__ = "user"
+    id: Mapped[intpk]
+    login: Mapped[str] = mapped_column(unique=True)
+    password: Mapped[str]
+
+    roles: Mapped[list["UserRole"]] = relationship(back_populates="user")
+
+
+--- FILE: app/models/userRole.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/models/userRole.py
+---
+from typing import Annotated
+
+from sqlalchemy import ForeignKey
+
+from app.db.base import Base
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+
+class UserRole(Base):
+    __tablename__ = "user_role"
+    user_id: Mapped[int] = mapped_column(ForeignKey("hh.user.id"), primary_key=True)
+    role_id: Mapped[int] = mapped_column(ForeignKey("hh.role.id"), primary_key=True)
+
+    role: Mapped["Role"] = relationship(back_populates="users")
+    user: Mapped["User"] = relationship(back_populates="roles")
+    
+
+
+--- FILE: app/models/vacancy.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/models/vacancy.py
+---
+from sqlalchemy import ForeignKey
+
+from app.db.base import Base, intpk, str_2048
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+class Vacancy(Base):
+    __tablename__ = "vacancy"
+
+    id: Mapped[intpk]
+    name: Mapped[str_2048]
+    area_id: Mapped[int] = mapped_column(ForeignKey("hh.area.id", ondelete="CASCADE"))
+    publishied_at: Mapped[str_2048]
+    requirement: Mapped[str_2048 | None]
+    responsobility: Mapped[str_2048 | None]
+    schedule: Mapped[str_2048]
+    prof_roles: Mapped[str_2048]
+    exp: Mapped[str_2048]
+    empoyment: Mapped[str_2048]
+    employers_name: Mapped[str_2048]
+
+    salary: Mapped["Salary | None"] = relationship(back_populates="vacancy")
+
+    def __eq__(self, other):
+        if not isinstance(other, Vacancy):
+            return False
+        return (self.id == other.id and 
+                self.name == other.name and 
+                self.area_id == other.area_id and 
+                self.publishied_at == other.publishied_at and 
+                self.requirement == other.requirement and 
+                self.responsobility == other.responsobility and 
+                self.schedule == other.schedule and 
+                self.prof_roles == other.prof_roles and 
+                self.exp == other.exp and 
+                self.empoyment == other.empoyment and 
+                self.employers_name == other.employers_name)
+
+    def __hash__(self):
+        return hash(self.id)
+    
+
+
+
+--- FILE: app/repositories/vacancyRepository.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/repositories/vacancyRepository.py
+---
+from sqlalchemy import select
+
+from app.models.vacancy import Vacancy
+
+
+class VacancyRepository:
+    def __init__(self, session):
+        self.session = session
+
+    async def get_vacancies(self):
+        stmt = select(Vacancy)
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
+    
+    async def get_vacancy_by_id(self, vacancy_id):
+        stmt = select(Vacancy).where(Vacancy.id == vacancy_id)
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
+    
+    async def get_vacancies_by_filters(self):
+        pass
+
+
+--- FILE: app/requirements.txt
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/requirements.txt
+---
+alembic==1.18.4
+annotated-doc==0.0.4
+annotated-types==0.7.0
+anyio==4.12.1
+asyncpg==0.31.0
+certifi==2026.2.25
+click==8.3.1
+ecdsa==0.19.1
+fastapi==0.133.0
+greenlet==3.3.2
+h11==0.16.0
+httpcore==1.0.9
+httpx==0.28.1
+idna==3.11
+Mako==1.3.10
+MarkupSafe==3.0.3
+psycopg2-binary==2.9.11
+pyasn1==0.6.2
+pydantic==2.12.5
+pydantic-settings==2.13.1
+pydantic_core==2.41.5
+python-dateutil==2.9.0.post0
+python-dotenv==1.2.1
+python-jose==3.5.0
+rsa==4.9.1
+six==1.17.0
+SQLAlchemy==2.0.47
+starlette==0.52.1
+typing-inspection==0.4.2
+typing_extensions==4.15.0
+uvicorn==0.41.0
+
+
+
+--- FILE: app/static/styles.css
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/static/styles.css
+---
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+nav a {
+    margin-right: 15px;
+}
+ul {
+    list-style: none;
+    padding: 0;
+}
+li {
+    border: 1px solid #ccc;
+    margin-bottom: 15px;
+    padding: 15px;
+    border-radius: 5px;
+}
+.pagination {
+    margin-top: 20px;
+}
+.pagination a {
+    margin: 0 10px;
+}
+
+
+--- FILE: app/templates/base.html
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/templates/base.html
+---
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Анализ рынка труда{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/">Главная</a>
+            <a href="/vacancies">Вакансии</a>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>© 2026 Анализ рынка труда</p>
+    </footer>
+
+    <script src="{{ url_for('static', path='js/scripts.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
+
+
+--- FILE: app/templates/vacancies.html
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/templates/vacancies.html
+---
+{% extends "base.html" %}
+
+{% block title %}Все вакансии{% endblock %}
+
+{% block content %}
+<h1>Список вакансий</h1>
+
+{% if vacancies %}
+    <ul>
+    {% for vacancy in vacancies %}
+        <li>
+            <h2>
+                <a href="{{ url_for('read_vacancy', vacancy_id=vacancy.id) }}">
+                    {{ vacancy.name }}
+                </a>
+            </h2>
+            <p><strong>Работодатель:</strong> {{ vacancy.employers_name }}</p>
+            <p><strong>Зарплата:</strong> 
+                {% if vacancy.salary %}
+                    от {{ vacancy.salary.s_from or 'не указана' }}
+                {% else %}
+                    не указана
+                {% endif %}
+            </p>
+            <p><strong>Опыт:</strong> {{ vacancy.exp }}</p>
+            <p><strong>Регион:</strong> {{ vacancy.area.name if vacancy.area else 'не указан' }}</p>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Вакансий пока нет.</p>
+{% endif %}
+
+{% if pagination and pagination.pages > 1 %}
+    <div class="pagination">
+        {% if pagination.prev_page %}
+            <a href="?page={{ pagination.prev_page }}">← Назад</a>
+        {% endif %}
+        <span>Страница {{ pagination.page }} из {{ pagination.pages }}</span>
+        {% if pagination.next_page %}
+            <a href="?page={{ pagination.next_page }}">Вперёд →</a>
+        {% endif %}
+    </div>
+{% endif %}
+{% endblock %}
+
+
+--- FILE: app/templates/vacancy_detail.html
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/templates/vacancy_detail.html
+---
+{% extends "base.html" %}
+
+{% block title %}{{ vacancy.name }} — детали вакансии{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Главная</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('list_vacancies') }}">Вакансии</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ vacancy.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h1 class="h3 mb-0">{{ vacancy.name }}</h1>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <p><strong>Работодатель:</strong> {{ vacancy.employers_name or 'Не указан' }}</p>
+                    <p><strong>Регион:</strong> {{ vacancy.area.name if vacancy.area else 'Не указан' }}</p>
+                    <p><strong>Дата публикации:</strong> {{ vacancy.published_at|default('Не указана', true) }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Зарплата:</strong>
+                        {% if vacancy.salary %}
+                            {% if vacancy.salary.s_from %}от {{ vacancy.salary.s_from }}{% endif %}
+                            {% if vacancy.salary.s_to %}до {{ vacancy.salary.s_to }}{% endif %}
+                            {{ vacancy.salary.currency or '' }}
+                            {% if vacancy.salary.gross %}(гросс){% endif %}
+                        {% else %}
+                            Не указана
+                        {% endif %}
+                    </p>
+                    <p><strong>Опыт работы:</strong> {{ vacancy.exp or 'Не указан' }}</p>
+                    <p><strong>График:</strong> {{ vacancy.schedule or 'Не указан' }}</p>
+                    <p><strong>Тип занятости:</strong> {{ vacancy.employment or 'Не указан' }}</p>
+                </div>
+            </div>
+
+            <hr>
+
+            <h5>Требования</h5>
+            <p>{{ vacancy.requirement or 'Не указаны' }}</p>
+
+            <h5>Обязанности</h5>
+            <p>{{ vacancy.responsibility or 'Не указаны' }}</p>
+
+            <h5>Профессиональные роли</h5>
+            <p>{{ vacancy.prof_roles or 'Не указаны' }}</p>
+
+            <div class="mt-4">
+                <a href="{{ url_for('list_vacancies') }}" class="btn btn-secondary">← Назад к списку</a>
+                <!-- можно добавить кнопку "Перейти на HH" если есть ссылка -->
+                {% if vacancy.hh_url %}
+                    <a href="{{ vacancy.hh_url }}" target="_blank" class="btn btn-outline-primary">Смотреть на HH</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+--- FILE: docker-compose.yaml
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/docker-compose.yaml
+---
+services:
+  analisys-postgres:
+    image: postgres:18.4-bookworm
+    container_name: analisys-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./out/pgdata:/var/lib/postgresql/
+
+  migrations:
+    build: .
+    container_name: hh_migrations
+    env_file:
+      - .env
+    depends_on:
+      - analisys-postgres
+    profiles: ["migrations"]
+    volumes:
+      - ./app:/app/app
+  
+  app:
+    build: .
+    container_name: hh_api
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "${HOST_PORT:-8000}:8000"
+    depends_on:
+      - analisys-postgres
+    command: python -m app.main
+
+  worker:
+    build: .
+    container_name: hh_worker
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - analisys-postgres
+    command: python -m worker.main
+
+
+--- FILE: requirements.txt
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/requirements.txt
+---
+alembic==1.18.4
+annotated-doc==0.0.4
+annotated-types==0.7.0
+anyio==4.12.1
+asyncpg==0.31.0
+certifi==2026.2.25
+click==8.3.1
+ecdsa==0.19.1
+fastapi==0.133.0
+greenlet==3.3.2
+h11==0.16.0
+httpcore==1.0.9
+httpx==0.28.1
+idna==3.11
+Jinja2==3.1.6
+Mako==1.3.10
+MarkupSafe==3.0.3
+psycopg2-binary==2.9.11
+pyasn1==0.6.2
+pydantic==2.12.5
+pydantic-settings==2.13.1
+pydantic_core==2.41.5
+python-dateutil==2.9.0.post0
+python-dotenv==1.2.1
+python-jose==3.5.0
+rsa==4.9.1
+six==1.17.0
+SQLAlchemy==2.0.47
+starlette==0.52.1
+typing-inspection==0.4.2
+typing_extensions==4.15.0
+uvicorn==0.41.0
+
+
+
+--- FILE: scripts/collect_source.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/scripts/collect_source.py
+---
+#!/usr/bin/env python3
+"""
+Collect all project source files into a single text file.
+
+Usage:
+    python scripts/collect_source.py -o project_source_dump.txt
+
+By default this walks the current working directory and collects files
+matching common source extensions while skipping common virtualenv, git
+and cache directories.
+"""
+import argparse
+import os
+from pathlib import Path
+from typing import Iterable, Set
+
+DEFAULT_EXTENSIONS = [
+    ".py", ".pyi", ".md", ".rst", ".txt", ".json", ".yaml", ".yml",
+    ".ini", ".cfg", ".toml", ".sh", ".sql", ".html", ".css", ".js", ".ts"
+]
+
+DEFAULT_EXCLUDE_DIRS = {".git", "__pycache__", ".venv", "venv", "env", "node_modules", ".pytest_cache"}
+
+
+def is_excluded_dir(path_parts: Iterable[str], exclude: Set[str]) -> bool:
+    return any(part in exclude for part in path_parts)
+
+
+def collect_files(root: Path, exts: Set[str], exclude_dirs: Set[str]):
+    for dirpath, dirnames, filenames in os.walk(root):
+        rel_parts = Path(dirpath).parts
+        if is_excluded_dir(rel_parts, exclude_dirs):
+            # prevent descending into excluded dirs
+            dirnames[:] = []
+            continue
+
+        # filter out excluded subdirs from traversal
+        dirnames[:] = [d for d in dirnames if d not in exclude_dirs]
+
+        for fname in filenames:
+            if any(fname.endswith(ext) for ext in exts):
+                yield Path(dirpath) / fname
+
+
+def write_dump(files, root: Path, out_path: Path):
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    total = 0
+    with out_path.open("w", encoding="utf-8") as out:
+        for f in files:
+            try:
+                rel = f.relative_to(root)
+            except Exception:
+                rel = f
+            out.write("""
+--- FILE: %s
+Path: %s
+---
+""" % (rel, f))
+            try:
+                with f.open("r", encoding="utf-8", errors="replace") as fh:
+                    out.write(fh.read())
+            except Exception as e:
+                out.write(f"[FAILED TO READ: {e}]\n")
+            out.write("\n\n")
+            total += 1
+    return total
+
+
+def parse_args():
+    p = argparse.ArgumentParser(description="Collect project source into one text file")
+    p.add_argument("-r", "--root", default=os.getcwd(), help="Root directory to walk (default: cwd)")
+    p.add_argument("-o", "--output", default="project_source_dump.txt", help="Output text file path")
+    p.add_argument("--ext", nargs="*", help="File extensions to include (e.g. .py .md). Overrides defaults")
+    p.add_argument("--exclude-dir", nargs="*", help="Directory names to exclude from traversal")
+    return p.parse_args()
+
+
+def main():
+    args = parse_args()
+    root = Path(args.root).resolve()
+    out = Path(args.output).resolve()
+
+    exts = set(DEFAULT_EXTENSIONS if not args.ext else args.ext)
+    exclude_dirs = set(DEFAULT_EXCLUDE_DIRS)
+    if args.exclude_dir:
+        exclude_dirs.update(args.exclude_dir)
+
+    files = list(collect_files(root, exts, exclude_dirs))
+    files.sort()
+
+    print(f"Found {len(files)} files to write into {out}")
+    total = write_dump(files, root, out)
+    print(f"Wrote {total} files to {out}")
+
+
+if __name__ == "__main__":
+    main()
+
+
+
+--- FILE: scripts/project_source_dump.txt
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/scripts/project_source_dump.txt
+---
+--- FILE: app/__init__.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/__init__.py
+---
+
+
+
+--- FILE: app/api/deps.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/api/deps.py
+---
+
+
+
+--- FILE: app/api/routers/__init__.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/api/routers/__init__.py
+---
+
+
+
+--- FILE: app/api/routers/role.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/api/routers/role.py
+---
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+
+from app.core.session import get_session
+from app.models import Role
+
+router = APIRouter(prefix="/roles", tags=["roles"])
+
+@router.get("/")
+async def list_roles(session: AsyncSession = Depends(get_session)):
+    stmt = select(Role)
+    result = await session.execute(stmt)
+    roles = result.scalars().all()
+    return [{"id": r.id, "name": r.name} for r in roles]
+
+
+--- FILE: app/api/routers/vacancies.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/api/routers/vacancies.py
+---
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+
+from app.core.session import get_session
+from app.models import Vacancy
+
+router = APIRouter(prefix="/vacancies", tags=["vacancies"])
+
+@router.get("/")
+async def list_roles(session: AsyncSession = Depends(get_session)):
+    stmt = select(Vacancy)
+    result = await session.execute(stmt)
+    roles = result.scalars().all()
+    return [r for r in roles]
+
+
+
+--- FILE: app/core/__init__.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/core/__init__.py
+---
+
+
+
+--- FILE: app/core/config.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/core/config.py
+---
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing import Dict, Any
+import os
+from dotenv import load_dotenv  # Опционально, fallback
+
+load_dotenv() 
+
+class Setting(BaseSettings):
+    host: str
+    port: int
+    max_users: int
+
+    db_user: str
+    db_password: str
+    db_port: str
+    db_host: str
+    db_name: str
+    time_interval_minutes: int
+
+    secret_key: str
+    algorithm: str
+    access_token_expire_minutes:int
+
+    hh_base_url: str
+    hh_api_key: str
+    parser_interval_seconds: int
+    per_page: int
+
+    encoding: str
+    debug: bool
+    app_name: str
+
+    def get_hh_headers(self):
+        return {
+            "User-Agent": self.app_name, "Authorization": f"Bearer {self.hh_api_key}"
+        }
+
+    def async_database_url(self):
+        return f"postgresql+asyncpg://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
+    
+    def sync_database_url(self):
+        return f"postgresql://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
+
+    model_config = SettingsConfigDict(
+        env_file=".env",              # Загрузка из .env в корне
+        env_file_encoding="utf-8",    # Кодировка
+        env_ignore_empty=True,        # Пустые vars = default
+        extra="ignore",               # Лишние vars игнор
+        case_sensitive=False          # python -> PYTHON_HOST
+    )
+
+settings = Setting()
+
+
+--- FILE: app/core/hhClient.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/core/hhClient.py
+---
+import httpx
+from app.core.config import settings
+
+class hhClient():
+    def __init__(self):
+        self.client = httpx.Client(
+            base_url=settings.hh_base_url,
+            headers=settings.get_hh_headers(),
+        )
+
+    def fetch_vacancies(self, params: dict):
+        resp = self.client.get("/vacancies", params=params)
+        resp.raise_for_status()
+        return resp.json()
+    
+    def fetch_area(self):
+        resp = self.client.get("/areas")
+        resp.raise_for_status()
+        return resp.json()
+
+
+--- FILE: app/core/session.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/core/session.py
+---
+from typing import AsyncGenerator
+
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from .config import settings
+
+engine = create_async_engine(settings.async_database_url(), echo=True)
+AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
+
+async def get_session() -> AsyncGenerator[AsyncSession, None]:
+    async with AsyncSessionLocal() as session:
+        yield session
+
+
+--- FILE: app/db/base.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/db/base.py
+---
+from typing import Annotated
+
+from sqlalchemy import String
+from sqlalchemy.orm import DeclarativeBase, mapped_column
+
+str_2048 = Annotated[str, 2048]
+intpk = Annotated[int, mapped_column(primary_key=True)]
+
+class Base(DeclarativeBase):
+    type_annotation_map = {
+        str_2048: String(2048)
+    }
+    pass
+
+
+--- FILE: app/db/migrations/env.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/db/migrations/env.py
+---
+from logging.config import fileConfig
+
+from sqlalchemy import engine_from_config
+from sqlalchemy import pool
+
+from alembic import context
+
+from core.config import settings
+from db.base import Base
+from app.models import Area, Employer, HHParserState, Permission, Role, RolePermission, Salary, User, UserRole, Vacancy
+
+# this is the Alembic Config object, which provides
+# access to the values within the .ini file in use.
+config = context.config
+
+url = settings.sync_database_url()
+
+if url:
+    config.set_main_option("sqlalchemy.url", url)
+    print(url)
+
+# Interpret the config file for Python logging.
+# This line sets up loggers basically.
+if config.config_file_name is not None:
+    fileConfig(config.config_file_name)
+
+# add your model's MetaData object here
+# for 'autogenerate' support
+# from myapp import mymodel
+# target_metadata = mymodel.Base.metadata
+target_metadata = Base.metadata
+
+# other values from the config, defined by the needs of env.py,
+# can be acquired:
+# my_important_option = config.get_main_option("my_important_option")
+# ... etc.
+
+
+def run_migrations_offline() -> None:
+    """Run migrations in 'offline' mode.
+
+    This configures the context with just a URL
+    and not an Engine, though an Engine is acceptable
+    here as well.  By skipping the Engine creation
+    we don't even need a DBAPI to be available.
+
+    Calls to context.execute() here emit the given string to the
+    script output.
+
+    """
+    url = config.get_main_option("sqlalchemy.url")
+    context.configure(
+        url=url,
+        target_metadata=target_metadata,
+        literal_binds=True,
+        dialect_opts={"paramstyle": "named"},
+    )
+
+    with context.begin_transaction():
+        context.run_migrations()
+
+
+def run_migrations_online() -> None:
+    """Run migrations in 'online' mode.
+
+    In this scenario we need to create an Engine
+    and associate a connection with the context.
+
+    """
+    connectable = engine_from_config(
+        config.get_section(config.config_ini_section, {}),
+        prefix="sqlalchemy.",
+        poolclass=pool.NullPool,
+    )
+
+    with connectable.connect() as connection:
+        context.configure(
+            connection=connection, target_metadata=target_metadata
+        )
+
+        with context.begin_transaction():
+            context.run_migrations()
+
+
+if context.is_offline_mode():
+    run_migrations_offline()
+else:
+    run_migrations_online()
+
+
+
+--- FILE: app/db/migrations/versions/6672b11be659_starter_data.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/db/migrations/versions/6672b11be659_starter_data.py
+---
+"""starter data
+
+Revision ID: 6672b11be659
+Revises: 9fc27f79eb2e
+Create Date: 2026-03-02 01:20:17.156817
+
+"""
+from typing import Sequence, Union
+
+from alembic import op
+import sqlalchemy as sa
+
+
+# revision identifiers, used by Alembic.
+revision: str = '6672b11be659'
+down_revision: Union[str, Sequence[str], None] = '9fc27f79eb2e'
+branch_labels: Union[str, Sequence[str], None] = None
+depends_on: Union[str, Sequence[str], None] = None
+
+
+def upgrade() -> None:
+    """Upgrade schema."""
+    # ### commands auto generated by Alembic - please adjust! ###
+    op.execute("""
+        INSERT INTO role (id, name) VALUES
+        (1, 'user'),
+        (2, 'moderator'),
+        (3, 'admin')
+        ON CONFLICT (id) DO NOTHING;
+    """)
+
+    # права
+    op.execute("""
+        INSERT INTO permission (id, name) VALUES
+        (1, 'view_vacancy'),
+        (2, 'update_db'),
+        (3, 'ban_user'),
+        (4, 'view_users')
+        ON CONFLICT (id) DO NOTHING;
+    """)
+
+    # связь роли и прав
+    op.execute("""
+        INSERT INTO role_permission (role_id, permission_id) VALUES
+        (1, 1),                -- user: view_vacancy
+        (2, 1), (2, 4),        -- moderator
+        (3, 1), (3, 2), (3, 3), (3, 4)  -- admin
+        ON CONFLICT DO NOTHING;
+    """)
+    # ### end Alembic commands ###
+
+
+def downgrade() -> None:
+    """Downgrade schema."""
+    # ### commands auto generated by Alembic - please adjust! ###
+    pass
+    # ### end Alembic commands ###
+
+
+
+--- FILE: app/db/migrations/versions/9fc27f79eb2e_init.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/db/migrations/versions/9fc27f79eb2e_init.py
+---
+"""init
+
+Revision ID: 9fc27f79eb2e
+Revises: 
+Create Date: 2026-03-02 01:16:17.129257
+
+"""
+from typing import Sequence, Union
+
+from alembic import op
+import sqlalchemy as sa
+
+
+# revision identifiers, used by Alembic.
+revision: str = '9fc27f79eb2e'
+down_revision: Union[str, Sequence[str], None] = None
+branch_labels: Union[str, Sequence[str], None] = None
+depends_on: Union[str, Sequence[str], None] = None
+
+
+def upgrade() -> None:
+    """Upgrade schema."""
+    # ### commands auto generated by Alembic - please adjust! ###
+    op.create_table('area',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('parent_id', sa.Integer(), nullable=True),
+    sa.Column('name', sa.String(), nullable=False),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('employer',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(), nullable=False),
+    sa.Column('accredited_it_employer', sa.Boolean(), nullable=False),
+    sa.Column('trusted', sa.Boolean(), nullable=False),
+    sa.PrimaryKeyConstraint('name')
+    )
+    op.create_table('hh_parse_state',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('mode', sa.String(), nullable=False),
+    sa.Column('date_from', sa.DateTime(), nullable=False),
+    sa.Column('date_to', sa.DateTime(), nullable=False),
+    sa.Column('per_page', sa.Integer(), nullable=False),
+    sa.Column('page', sa.Integer(), nullable=False),
+    sa.Column('done', sa.Boolean(), nullable=False),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('permission',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(), nullable=False),
+    sa.Column('description', sa.String(length=2048), nullable=True),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('name')
+    )
+    op.create_table('role',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(), nullable=False),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('name')
+    )
+    op.create_table('salary',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('s_from', sa.Integer(), nullable=True),
+    sa.Column('s_to', sa.Integer(), nullable=True),
+    sa.Column('currency', sa.String(length=2048), nullable=True),
+    sa.Column('gross', sa.Boolean(), nullable=True),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('user',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('login', sa.String(), nullable=False),
+    sa.Column('password', sa.String(), nullable=False),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('login')
+    )
+    op.create_table('role_permission',
+    sa.Column('role_id', sa.Integer(), nullable=False),
+    sa.Column('permission_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['permission_id'], ['permission.id'], ),
+    sa.ForeignKeyConstraint(['role_id'], ['role.id'], ),
+    sa.PrimaryKeyConstraint('role_id', 'permission_id')
+    )
+    op.create_table('user_role',
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('role_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['role_id'], ['role.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('user_id', 'role_id')
+    )
+    op.create_table('vacancy',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(length=2048), nullable=False),
+    sa.Column('area_id', sa.Integer(), nullable=False),
+    sa.Column('publishied_at', sa.String(length=2048), nullable=False),
+    sa.Column('requirement', sa.String(length=2048), nullable=True),
+    sa.Column('responsobility', sa.String(length=2048), nullable=True),
+    sa.Column('schedule', sa.String(length=2048), nullable=False),
+    sa.Column('prof_roles', sa.String(length=2048), nullable=False),
+    sa.Column('exp', sa.String(length=2048), nullable=False),
+    sa.Column('empoyment', sa.String(length=2048), nullable=False),
+    sa.Column('employers_name', sa.String(length=2048), nullable=False),
+    sa.ForeignKeyConstraint(['area_id'], ['area.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
+    )
+    # ### end Alembic commands ###
+
+
+def downgrade() -> None:
+    """Downgrade schema."""
+    # ### commands auto generated by Alembic - please adjust! ###
+    op.drop_table('vacancy')
+    op.drop_table('user_role')
+    op.drop_table('role_permission')
+    op.drop_table('user')
+    op.drop_table('salary')
+    op.drop_table('role')
+    op.drop_table('permission')
+    op.drop_table('hh_parse_state')
+    op.drop_table('employer')
+    op.drop_table('area')
+    # ### end Alembic commands ###
+
+
+
+--- FILE: app/main.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/main.py
+---
+from fastapi import FastAPI
+
+from app.core.config import settings
+import uvicorn
+
+from app.api.routers import role, vacancies
+
+app = FastAPI(title="PZ-2 HeadHunter API", debug=settings.debug)
+
+app.include_router(role.router)
+app.include_router(vacancies.router)
+
+@app.get("/")
+async def root():
+    return {
+        "message": "PZ-2 FastAPI server started",
+        "config": {
+            "port": settings.port,
+            "db_host": settings.db_host
+        }
+    }
+
+
+if __name__ == "__main__":
+    uvicorn.run("app.main:app", host=settings.host, port=settings.port, reload=settings.debug)
+
+
+--- FILE: app/models/__init__.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/models/__init__.py
+---
+from .permission import Permission
+from .role import Role
+from .rolePermission import RolePermission
+from .user import User
+from .userRole import UserRole
+from .hhParserState import HHParserState
+from .area import Area
+from .employer import Employer
+from .salary import Salary
+from .vacancy import Vacancy
+
+__all__ = [
+    "Permission",
+    "Role",
+    "RolePermission",
+    "User",
+    "UserRole",
+    "HHParserState",
+    "Area",
+    "Employer",
+    "Salary",
+    "Vacancy",
+]
+
+
+--- FILE: app/models/area.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/models/area.py
+---
+from app.db.base import Base, intpk
+from sqlalchemy.orm import Mapped
+
+class Area(Base):
+    __tablename__ = "area"
+    id: Mapped[intpk]
+    parent_id: Mapped[int | None]
+    name: Mapped[str]
+
+    def __eq__(self, other):
+        if not isinstance(other, Area):
+            return False
+        return (self.id == other.id and 
+                self.parent_id == other.parent_id and 
+                self.name == other.name)
+
+    def __hash__(self):
+        # Для примера можно использовать хэширование по id
+        return hash(self.id)
+
+
+--- FILE: app/models/employer.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/models/employer.py
+---
+from app.db.base import Base, intpk, str_2048
+from sqlalchemy.orm import Mapped, mapped_column
+
+class Employer(Base):
+    __tablename__ = "employer"
+    id: Mapped[int]
+    name: Mapped[str] = mapped_column(primary_key=True)
+    accredited_it_employer: Mapped[bool] 
+    trusted: Mapped[bool]
+
+    def __eq__(self, other):
+        if not isinstance(other, Employer):
+            return NotImplemented
+        return (self.name == other.name and
+                self.accredited_it_employer == other.accredited_it_employer and
+                self.trusted == other.trusted)
+
+    def __hash__(self):
+        return hash((self.name, self.accredited_it_employer, self.trusted))
+
+
+--- FILE: app/models/hhParserState.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/models/hhParserState.py
+---
+from datetime import datetime
+
+from app.db.base import Base, intpk
+from sqlalchemy.orm import Mapped, mapped_column
+
+class HHParserState(Base):
+    __tablename__ = "hh_parse_state"
+    id: Mapped[intpk]
+    mode: Mapped[str] = mapped_column(default="/vacancies")
+    date_from: Mapped[datetime]
+    date_to: Mapped[datetime]
+    per_page: Mapped[int]
+    page: Mapped[int]
+    done: Mapped[bool] = mapped_column(default=False)
+
+
+--- FILE: app/models/permission.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/models/permission.py
+---
+from typing import Annotated
+
+from app.db.base import Base, intpk, str_2048
+from sqlalchemy.orm import Mapped, mapped_column
+
+class Permission(Base):
+    __tablename__ = "permission"
+    id: Mapped[intpk]
+    name: Mapped[Annotated[str, 30]] = mapped_column(unique=True)
+    description: Mapped[str_2048 | None]
+
+
+--- FILE: app/models/role.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/models/role.py
+---
+from typing import Annotated
+
+from app.db.base import Base, intpk, str_2048
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+class Role(Base):
+    __tablename__ = "role"
+    id: Mapped[intpk]
+    name: Mapped[Annotated[str, 30]] = mapped_column(unique=True)
+
+    users: Mapped[list["UserRole"]] = relationship(back_populates="role")
+
+
+--- FILE: app/models/rolePermission.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/models/rolePermission.py
+---
+from sqlalchemy import ForeignKey
+
+from app.db.base import Base
+from sqlalchemy.orm import Mapped, mapped_column
+
+class RolePermission(Base):
+    __tablename__ = "role_permission"
+    role_id: Mapped[int] = mapped_column(ForeignKey("role.id"), primary_key=True)
+    permission_id: Mapped[int] = mapped_column(ForeignKey("permission.id"), primary_key=True)
+
+
+--- FILE: app/models/salary.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/models/salary.py
+---
+from app.db.base import Base, intpk, str_2048
+from sqlalchemy.orm import Mapped, mapped_column
+
+class Salary(Base):
+    __tablename__ = "salary"
+
+    id: Mapped[intpk] #= mapped_column(ForeignKey("vacancy.id", ondelete="CASCADE"))
+    s_from: Mapped[int | None] 
+    s_to: Mapped[int | None] 
+    currency: Mapped[str_2048 | None]
+    gross: Mapped[bool | None]
+
+    def __eq__(self, other):
+        if not isinstance(other, Salary):
+            return False
+        return (self.id == other.id and 
+                self.s_from == other.s_from and 
+                self.s_to == other.s_to and 
+                self.currency == other.currency and 
+                self.gross == other.gross)
+
+    def __hash__(self):
+        return hash(self.id)
+
+
+--- FILE: app/models/user.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/models/user.py
+---
+from app.db.base import Base, intpk
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+
+class User(Base):
+    __tablename__ = "user"
+    id: Mapped[intpk]
+    login: Mapped[str] = mapped_column(unique=True)
+    password: Mapped[str]
+
+    roles: Mapped[list["UserRole"]] = relationship(back_populates="user")
+
+
+--- FILE: app/models/userRole.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/models/userRole.py
+---
+from typing import Annotated
+
+from sqlalchemy import ForeignKey
+
+from app.db.base import Base
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+
+class UserRole(Base):
+    __tablename__ = "user_role"
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), primary_key=True)
+    role_id: Mapped[int] = mapped_column(ForeignKey("role.id"), primary_key=True)
+
+    role: Mapped["Role"] = relationship(back_populates="users")
+    user: Mapped["User"] = relationship(back_populates="roles")
+    
+
+
+--- FILE: app/models/vacancy.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/models/vacancy.py
+---
+from sqlalchemy import ForeignKey
+
+from app.db.base import Base, intpk, str_2048
+from sqlalchemy.orm import Mapped, mapped_column
+
+class Vacancy(Base):
+    __tablename__ = "vacancy"
+
+    id: Mapped[intpk]
+    name: Mapped[str_2048]
+    area_id: Mapped[int] = mapped_column(ForeignKey("area.id", ondelete="CASCADE"))
+    publishied_at: Mapped[str_2048]
+    requirement: Mapped[str_2048 | None]
+    responsobility: Mapped[str_2048 | None]
+    schedule: Mapped[str_2048]
+    prof_roles: Mapped[str_2048]
+    exp: Mapped[str_2048]
+    empoyment: Mapped[str_2048]
+    employers_name: Mapped[str_2048]
+
+    def __eq__(self, other):
+        if not isinstance(other, Vacancy):
+            return False
+        return (self.id == other.id and 
+                self.name == other.name and 
+                self.area_id == other.area_id and 
+                self.publishied_at == other.publishied_at and 
+                self.requirement == other.requirement and 
+                self.responsobility == other.responsobility and 
+                self.schedule == other.schedule and 
+                self.prof_roles == other.prof_roles and 
+                self.exp == other.exp and 
+                self.empoyment == other.empoyment and 
+                self.employers_name == other.employers_name)
+
+    def __hash__(self):
+        return hash(self.id)
+    
+
+
+
+--- FILE: app/repositories/vacancyRepository.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/repositories/vacancyRepository.py
+---
+from sqlalchemy import select
+
+from app.models.vacancy import Vacancy
+
+
+class VacancyRepository:
+    def __init__(self, session):
+        self.session = session
+
+    async def get_vacancies(self):
+        stmt = select(Vacancy)
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
+    
+    async def get_vacancy_by_id(self, vacancy_id):
+        stmt = select(Vacancy).where(Vacancy.id == vacancy_id)
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
+    
+    async def get_vacancies_by_filters(self):
+        pass
+
+
+--- FILE: app/requirements.txt
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/app/requirements.txt
+---
+alembic==1.18.4
+annotated-doc==0.0.4
+annotated-types==0.7.0
+anyio==4.12.1
+asyncpg==0.31.0
+certifi==2026.2.25
+click==8.3.1
+ecdsa==0.19.1
+fastapi==0.133.0
+greenlet==3.3.2
+h11==0.16.0
+httpcore==1.0.9
+httpx==0.28.1
+idna==3.11
+Mako==1.3.10
+MarkupSafe==3.0.3
+psycopg2-binary==2.9.11
+pyasn1==0.6.2
+pydantic==2.12.5
+pydantic-settings==2.13.1
+pydantic_core==2.41.5
+python-dateutil==2.9.0.post0
+python-dotenv==1.2.1
+python-jose==3.5.0
+rsa==4.9.1
+six==1.17.0
+SQLAlchemy==2.0.47
+starlette==0.52.1
+typing-inspection==0.4.2
+typing_extensions==4.15.0
+uvicorn==0.41.0
+
+
+
+--- FILE: requirements.txt
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/requirements.txt
+---
+alembic==1.18.4
+annotated-doc==0.0.4
+annotated-types==0.7.0
+anyio==4.12.1
+asyncpg==0.31.0
+certifi==2026.2.25
+click==8.3.1
+ecdsa==0.19.1
+fastapi==0.133.0
+greenlet==3.3.2
+h11==0.16.0
+httpcore==1.0.9
+httpx==0.28.1
+idna==3.11
+Mako==1.3.10
+MarkupSafe==3.0.3
+psycopg2-binary==2.9.11
+pyasn1==0.6.2
+pydantic==2.12.5
+pydantic-settings==2.13.1
+pydantic_core==2.41.5
+python-dateutil==2.9.0.post0
+python-dotenv==1.2.1
+python-jose==3.5.0
+rsa==4.9.1
+six==1.17.0
+SQLAlchemy==2.0.47
+starlette==0.52.1
+typing-inspection==0.4.2
+typing_extensions==4.15.0
+uvicorn==0.41.0
+
+
+
+--- FILE: scripts/collect_source.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/scripts/collect_source.py
+---
+#!/usr/bin/env python3
+"""
+Collect all project source files into a single text file.
+
+Usage:
+    python scripts/collect_source.py -o project_source_dump.txt
+
+By default this walks the current working directory and collects files
+matching common source extensions while skipping common virtualenv, git
+and cache directories.
+"""
+import argparse
+import os
+from pathlib import Path
+from typing import Iterable, Set
+
+DEFAULT_EXTENSIONS = [
+    ".py", ".pyi", ".md", ".rst", ".txt", ".json", ".yaml", ".yml",
+    ".ini", ".cfg", ".toml", ".sh", ".sql", ".html", ".css", ".js", ".ts"
+]
+
+DEFAULT_EXCLUDE_DIRS = {".git", "__pycache__", ".venv", "venv", "env", "node_modules", ".pytest_cache"}
+
+
+def is_excluded_dir(path_parts: Iterable[str], exclude: Set[str]) -> bool:
+    return any(part in exclude for part in path_parts)
+
+
+def collect_files(root: Path, exts: Set[str], exclude_dirs: Set[str]):
+    for dirpath, dirnames, filenames in os.walk(root):
+        rel_parts = Path(dirpath).parts
+        if is_excluded_dir(rel_parts, exclude_dirs):
+            # prevent descending into excluded dirs
+            dirnames[:] = []
+            continue
+
+        # filter out excluded subdirs from traversal
+        dirnames[:] = [d for d in dirnames if d not in exclude_dirs]
+
+        for fname in filenames:
+            if any(fname.endswith(ext) for ext in exts):
+                yield Path(dirpath) / fname
+
+
+def write_dump(files, root: Path, out_path: Path):
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    total = 0
+    with out_path.open("w", encoding="utf-8") as out:
+        for f in files:
+            try:
+                rel = f.relative_to(root)
+            except Exception:
+                rel = f
+            out.write("""
+--- FILE: %s
+Path: %s
+---
+""" % (rel, f))
+            try:
+                with f.open("r", encoding="utf-8", errors="replace") as fh:
+                    out.write(fh.read())
+            except Exception as e:
+                out.write(f"[FAILED TO READ: {e}]\n")
+            out.write("\n\n")
+            total += 1
+    return total
+
+
+def parse_args():
+    p = argparse.ArgumentParser(description="Collect project source into one text file")
+    p.add_argument("-r", "--root", default=os.getcwd(), help="Root directory to walk (default: cwd)")
+    p.add_argument("-o", "--output", default="project_source_dump.txt", help="Output text file path")
+    p.add_argument("--ext", nargs="*", help="File extensions to include (e.g. .py .md). Overrides defaults")
+    p.add_argument("--exclude-dir", nargs="*", help="Directory names to exclude from traversal")
+    return p.parse_args()
+
+
+def main():
+    args = parse_args()
+    root = Path(args.root).resolve()
+    out = Path(args.output).resolve()
+
+    exts = set(DEFAULT_EXTENSIONS if not args.ext else args.ext)
+    exclude_dirs = set(DEFAULT_EXCLUDE_DIRS)
+    if args.exclude_dir:
+        exclude_dirs.update(args.exclude_dir)
+
+    files = list(collect_files(root, exts, exclude_dirs))
+    files.sort()
+
+    print(f"Found {len(files)} files to write into {out}")
+    total = write_dump(files, root, out)
+    print(f"Wrote {total} files to {out}")
+
+
+if __name__ == "__main__":
+    main()
+
+
+
+--- FILE: tests/__init__.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/tests/__init__.py
+---
+
+
+
+--- FILE: tests/tests.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/tests/tests.py
+---
+import unittest
+import sys
+
+sys.path.insert(1, 'C:\\Users\\maksi\\OneDrive\\Рабочий стол\\СибГУТИ\\4 курс\\8 Семестр\\diplom\\server')
+
+from model.src.database_handler import Database_handler
+
+class TestDatabaseHandler(unittest.TestCase):
+    def setUp(self):
+        self.db_handler = Database_handler()
+
+    def test_Inizialization(self):
+        res = self.db_handler.execute("SELECT 1, 2, 3")
+        self.assertEqual(res.first(), (1, 2, 3))
+        
+if __name__ == "__main__":
+    unittest.main()
+
+
+--- FILE: worker/__init__.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/worker/__init__.py
+---
+
+
+
+--- FILE: worker/main.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/worker/main.py
+---
+import asyncio
+
+from app.core.session import AsyncSessionLocal
+from app.core.config import settings
+from worker.utils import init_areas_if_needed, parse_hh_data
+
+
+async def run_worker():
+    async with AsyncSessionLocal() as session:
+        await init_areas_if_needed(session)
+
+    while True:
+        async with AsyncSessionLocal() as session:
+            await parse_hh_data(session)
+        await asyncio.sleep(settings.parser_interval_seconds)
+
+
+if __name__ == "__main__":
+     asyncio.run(run_worker())
+
+
+--- FILE: worker/utils.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/worker/utils.py
+---
+from datetime import datetime, timedelta
+
+from dateutil.parser import isoparse
+from sqlalchemy import desc, func, select, update
+from sqlalchemy.dialects.postgresql import insert
+
+from app.models.area import Area
+from app.core.config import settings
+from app.models.salary import Salary
+from app.models.employer import Employer
+from app.models.vacancy import Vacancy
+from app.models.hhParserState import HHParserState
+from app.core.hhClient import hhClient
+
+
+async def get_state(session):
+    result = await session.execute(
+        select(HHParserState).where(HHParserState.done == False).limit(1)
+    )
+    state = result.scalar()
+
+    if state is None:
+        await update_state(session)
+        result = await session.execute(
+            select(HHParserState).where(HHParserState.done == False).limit(1)
+        )
+        state = result.scalar()
+
+    return state
+
+async def close_interval_states(session, state):
+    stmt = (
+            update(HHParserState)
+            .where(
+                HHParserState.date_from == state.date_from,
+                HHParserState.date_to == state.date_to,
+                HHParserState.page >= state.page,
+                HHParserState.done == False,
+            )
+            .values(done=True)
+        )
+    await session.execute(stmt)
+    await session.commit()
+
+async def update_state(session):
+    stmt = await session.execute(
+        select(HHParserState).order_by(desc(HHParserState.date_to))
+    )
+
+    last_state = stmt.scalar()
+    intervals = []
+    today = datetime.today()
+    if last_state is None:
+        last_state = today - timedelta(days=30)
+        current_start_date = last_state
+    while current_start_date < today:
+        current_end_date = current_start_date + timedelta(minutes=settings.time_interval_minutes)  # Интервал в один час
+        intervals.append({
+            'date_from': current_start_date.isoformat(),
+            'date_to': current_end_date.isoformat()
+        })
+        current_start_date += timedelta(minutes=settings.time_interval_minutes+5)
+
+    for interval in intervals:
+        for page in range(0, 19):
+            params = {
+                'date_from': isoparse(interval["date_from"]),
+                'date_to': isoparse(interval["date_to"]),
+                'per_page': settings.per_page,
+                'page': page,
+                'done': False,
+            }
+            stmt = insert(HHParserState).values(params)
+            await session.execute(stmt)
+            await session.commit()
+
+async def init_areas_if_needed(session):
+    count = await session.scalar(select(func.count()).select_from(Area))
+
+    if count and count > 0:
+        return
+    client = hhClient()
+    areas_raw = client.fetch_area()
+    areas = format(areas_raw)
+
+    session.add_all(areas)
+    await session.commit()
+
+async def parse_hh_data(session):
+    client = hhClient()
+    while True:
+        state = await get_state(session)
+        print(state.id)
+        data = client.fetch_vacancies({
+            "page": state.page, 
+            "per_page": state.per_page, 
+            "date_from": state.date_from.isoformat(),
+            "date_to": state.date_to.isoformat(),
+            "page": state.page,
+            })
+        items = data.get("items", [])
+        pages = data.get("pages")
+        if not items:
+            await close_interval_states(session, state)
+            return
+
+        vacancy_values = [map_vacancy(i) for i in items]
+        employer_values = [map_employer(i) for i in items]
+        salary_values = [map_salary(i) for i in items]
+
+        stmt = insert(Vacancy).values(vacancy_values)
+        stmt = stmt.on_conflict_do_nothing(index_elements=[Vacancy.id])
+        await session.execute(stmt)
+
+        stmt = insert(Salary).values(salary_values)
+        stmt = stmt.on_conflict_do_nothing(index_elements=[Salary.id])
+        await session.execute(stmt)
+
+        stmt = insert(Employer).values(employer_values)
+        stmt = stmt.on_conflict_do_nothing(index_elements=[Employer.name])
+        await session.execute(stmt)
+
+        state.done = True
+        session.add(state)
+        await session.commit()
+
+def format(areas_raw):
+    data = []
+    for i in areas_raw:
+        _id = int(i["id"])
+        _parent_id = int(i["parent_id"]) if i["parent_id"] is not None else None
+        _name = i["name"]
+        parent = [Area(id = _id, parent_id = _parent_id, name = _name)]
+        child = [j for j in dop_format(i["areas"])]
+        parent.extend(child)
+        data.extend(parent)
+
+    return data
+
+def dop_format(b):
+    if b == []:
+        return  
+    buffer = []
+    for i in b:
+        _id = int(i["id"])
+        _parent_id = int(i["parent_id"]) if i["parent_id"] is not None else None
+        _name = i["name"]
+        temp = Area(id = _id, parent_id = _parent_id, name = _name)
+        buffer.append(temp)
+        if i["areas"] == []:
+            continue
+        buffer.extend(dop_format(i["areas"]))
+    return buffer
+
+def map_salary(item: dict) -> dict:
+    _id = int(item["id"])
+    sal = item.get("salary")
+    if not sal:
+        return {"id": _id, "s_from": None, "s_to": None, "currency": None, "gross": None}
+
+    _from = int(sal["from"]) if sal.get("from") else None
+    _to = int(sal["to"]) if sal.get("to") else None
+
+    return {
+        "id": _id,
+        "s_from": _from,
+        "s_to": _to,
+        "currency": sal["currency"],
+        "gross": sal["gross"],
+    }
+
+
+def map_employer(item: dict) -> dict:
+    emp = item["employer"]
+    return {
+        "id": int(item["id"]),
+        "name": emp["name"],
+        "accredited_it_employer": emp.get("accredited_it_employer", False),
+        "trusted": emp["trusted"],
+    }
+
+
+def map_vacancy(item: dict) -> dict:
+    _id = int(item["id"])
+    return {
+        "id": _id,
+        "name": item["name"],
+        "area_id": int(item["area"]["id"]),
+        "publishied_at": item["published_at"],
+        "requirement": item["snippet"]["requirement"],
+        "responsobility": item["snippet"]["responsibility"],
+        "schedule": item.get("schedule", {}).get("id", "unknown"),
+        "prof_roles": item["professional_roles"][0]["name"],
+        "exp": item["experience"]["id"],
+        "empoyment": item["id"],
+        "employers_name": item["employer"]["name"],
+    }
+
+
+
+
+
+--- FILE: tests/__init__.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/tests/__init__.py
+---
+
+
+
+--- FILE: tests/conftest.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/tests/conftest.py
+---
+import pytest
+from typing import AsyncGenerator
+from httpx import AsyncClient, ASGITransport
+import pytest_asyncio
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+
+from app.main import app
+from app.db import base
+from app.core.config import settings
+from app.core.session import get_session
+
+
+engine_test = create_async_engine(
+    settings.async_database_url_test(), 
+    echo=False
+)
+TestingSessionLocal = async_sessionmaker(
+    autocommit=False, 
+    autoflush=False, 
+    bind=engine_test, 
+    class_=AsyncSession
+)
+
+@pytest.fixture(scope="session", autouse=True)
+async def setup_db() -> AsyncGenerator:
+    """Создает таблицы перед тестами и удаляет после."""
+    async with engine_test.begin() as conn:
+        await conn.run_sync(base.Base.metadata.create_all)
+    yield
+    async with engine_test.begin() as conn:
+        await conn.run_sync(base.Base.metadata.drop_all)
+
+@pytest_asyncio.fixture
+async def client():
+    async def override_get_session():
+        print("TEST SESSION")
+        async with TestingSessionLocal() as session:
+            yield session
+
+    app.dependency_overrides[get_session] = override_get_session
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+    ) as client:
+        yield client
+
+    app.dependency_overrides.clear()
+
+
+
+
+--- FILE: tests/test_api.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/tests/test_api.py
+---
+import pytest
+from httpx import AsyncClient, ASGITransport
+
+from app.main import app
+
+@pytest.mark.asyncio
+async def test_list_vacancies(client): 
+    response = await client.get("/vacancies/")
+        
+    assert response.status_code == 200
+
+
+--- FILE: worker/__init__.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/worker/__init__.py
+---
+
+
+
+--- FILE: worker/main.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/worker/main.py
+---
+import asyncio
+
+from app.core.session import AsyncSessionLocal
+from app.core.config import settings
+from worker.utils import init_areas_if_needed, parse_hh_data
+
+
+async def run_worker():
+    async with AsyncSessionLocal() as session:
+        await init_areas_if_needed(session)
+
+    while True:
+        async with AsyncSessionLocal() as session:
+            await parse_hh_data(session)
+        await asyncio.sleep(settings.parser_interval_seconds)
+
+
+if __name__ == "__main__":
+     asyncio.run(run_worker())
+
+
+--- FILE: worker/utils.py
+Path: /Users/maksim/dev/analysis-of-data-from-the-Head-Hunter-portal/worker/utils.py
+---
+from datetime import datetime, timedelta
+
+from dateutil.parser import isoparse
+from sqlalchemy import desc, func, select, update
+from sqlalchemy.dialects.postgresql import insert
+
+from app.models.area import Area
+from app.core.config import settings
+from app.models.salary import Salary
+from app.models.employer import Employer
+from app.models.vacancy import Vacancy
+from app.models.hhParserState import HHParserState
+from app.core.hhClient import hhClient
+
+
+async def get_state(session):
+    result = await session.execute(
+        select(HHParserState).where(HHParserState.done == False).limit(1)
+    )
+    state = result.scalar()
+
+    if state is None:
+        await update_state(session)
+        result = await session.execute(
+            select(HHParserState).where(HHParserState.done == False).limit(1)
+        )
+        state = result.scalar()
+
+    return state
+
+async def close_interval_states(session, state):
+    stmt = (
+            update(HHParserState)
+            .where(
+                HHParserState.date_from == state.date_from,
+                HHParserState.date_to == state.date_to,
+                HHParserState.page >= state.page,
+                HHParserState.done == False,
+            )
+            .values(done=True)
+        )
+    await session.execute(stmt)
+    await session.commit()
+
+async def update_state(session):
+    stmt = await session.execute(
+        select(HHParserState).order_by(desc(HHParserState.date_to))
+    )
+
+    last_state = stmt.scalar()
+    intervals = []
+    today = datetime.today()
+    if last_state is None:
+        last_state = today - timedelta(days=30)
+        current_start_date = last_state
+    while current_start_date < today:
+        current_end_date = current_start_date + timedelta(minutes=settings.time_interval_minutes)  # Интервал в один час
+        intervals.append({
+            'date_from': current_start_date.isoformat(),
+            'date_to': current_end_date.isoformat()
+        })
+        current_start_date += timedelta(minutes=settings.time_interval_minutes+5)
+
+    for interval in intervals:
+        for page in range(0, 19):
+            params = {
+                'date_from': isoparse(interval["date_from"]),
+                'date_to': isoparse(interval["date_to"]),
+                'per_page': settings.per_page,
+                'page': page,
+                'done': False,
+            }
+            stmt = insert(HHParserState).values(params)
+            await session.execute(stmt)
+            await session.commit()
+
+async def init_areas_if_needed(session):
+    count = await session.scalar(select(func.count()).select_from(Area))
+
+    if count and count > 0:
+        return
+    client = hhClient()
+    areas_raw = client.fetch_area()
+    areas = format(areas_raw)
+
+    session.add_all(areas)
+    await session.commit()
+
+async def parse_hh_data(session):
+    client = hhClient()
+    while True:
+        state = await get_state(session)
+        print(state.id)
+        data = client.fetch_vacancies({
+            "page": state.page, 
+            "per_page": state.per_page, 
+            "date_from": state.date_from.isoformat(),
+            "date_to": state.date_to.isoformat(),
+            "page": state.page,
+            })
+        items = data.get("items", [])
+        pages = data.get("pages")
+        if not items:
+            await close_interval_states(session, state)
+            return
+
+        vacancy_values = [map_vacancy(i) for i in items]
+        employer_values = [map_employer(i) for i in items]
+        salary_values = [map_salary(i) for i in items]
+
+        stmt = insert(Vacancy).values(vacancy_values)
+        stmt = stmt.on_conflict_do_nothing(index_elements=[Vacancy.id])
+        await session.execute(stmt)
+
+        stmt = insert(Salary).values(salary_values)
+        stmt = stmt.on_conflict_do_nothing(index_elements=[Salary.id])
+        await session.execute(stmt)
+
+        stmt = insert(Employer).values(employer_values)
+        stmt = stmt.on_conflict_do_nothing(index_elements=[Employer.name])
+        await session.execute(stmt)
+
+        state.done = True
+        session.add(state)
+        await session.commit()
+
+def format(areas_raw):
+    data = []
+    for i in areas_raw:
+        _id = int(i["id"])
+        _parent_id = int(i["parent_id"]) if i["parent_id"] is not None else None
+        _name = i["name"]
+        parent = [Area(id = _id, parent_id = _parent_id, name = _name)]
+        child = [j for j in dop_format(i["areas"])]
+        parent.extend(child)
+        data.extend(parent)
+
+    return data
+
+def dop_format(b):
+    if b == []:
+        return  
+    buffer = []
+    for i in b:
+        _id = int(i["id"])
+        _parent_id = int(i["parent_id"]) if i["parent_id"] is not None else None
+        _name = i["name"]
+        temp = Area(id = _id, parent_id = _parent_id, name = _name)
+        buffer.append(temp)
+        if i["areas"] == []:
+            continue
+        buffer.extend(dop_format(i["areas"]))
+    return buffer
+
+def map_salary(item: dict) -> dict:
+    _id = int(item["id"])
+    sal = item.get("salary")
+    if not sal:
+        return {"id": _id, "s_from": None, "s_to": None, "currency": None, "gross": None}
+
+    _from = int(sal["from"]) if sal.get("from") else None
+    _to = int(sal["to"]) if sal.get("to") else None
+
+    return {
+        "id": _id,
+        "s_from": _from,
+        "s_to": _to,
+        "currency": sal["currency"],
+        "gross": sal["gross"],
+    }
+
+
+def map_employer(item: dict) -> dict:
+    emp = item["employer"]
+    return {
+        "id": int(item["id"]),
+        "name": emp["name"],
+        "accredited_it_employer": emp.get("accredited_it_employer", False),
+        "trusted": emp["trusted"],
+    }
+
+
+def map_vacancy(item: dict) -> dict:
+    _id = int(item["id"])
+    return {
+        "id": _id,
+        "name": item["name"],
+        "area_id": int(item["area"]["id"]),
+        "publishied_at": item["published_at"],
+        "requirement": item["snippet"]["requirement"],
+        "responsobility": item["snippet"]["responsibility"],
+        "schedule": item.get("schedule", {}).get("id", "unknown"),
+        "prof_roles": item["professional_roles"][0]["name"],
+        "exp": item["experience"]["id"],
+        "empoyment": item["id"],
+        "employers_name": item["employer"]["name"],
+    }
+
+

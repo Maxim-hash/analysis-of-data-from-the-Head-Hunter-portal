@@ -8,7 +8,7 @@ from fastapi import Request
 from sqlalchemy.orm import selectinload
 
 from app.core.session import get_session
-from app.models import Vacancy
+from app.models import Vacancy, Area
 
 router = APIRouter(prefix="/vacancies", tags=["vacancies"])
 
@@ -28,6 +28,7 @@ async def list_vacancies(
         select(Vacancy)
         .options(
             selectinload(Vacancy.salary),
+            selectinload(Vacancy.area),
         )
         .offset(offset)
         .limit(limit)
@@ -59,7 +60,12 @@ async def read_vacancy(
     vacancy_id: int,
     session: AsyncSession = Depends(get_session),
 ):
-    stmt = select(Vacancy).where(Vacancy.id == vacancy_id)
+    stmt = (
+    select(Vacancy)
+    .options(selectinload(Vacancy.salary), 
+             selectinload(Vacancy.area))
+    .where(Vacancy.id == vacancy_id)
+    )
     result = await session.execute(stmt)
     vacancy = result.scalar_one_or_none()
     if not vacancy: 
