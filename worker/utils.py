@@ -113,7 +113,15 @@ async def parse_hh_data(session):
         await session.execute(stmt)
 
         stmt = insert(Salary).values(salary_values)
-        stmt = stmt.on_conflict_do_nothing(index_elements=[Salary.id])
+        stmt = stmt.on_conflict_do_update(
+            index_elements=[Salary.vacancy_id],
+            set_= {
+                "s_from" : stmt.excluded.s_from,
+                "s_to" : stmt.excluded.s_to,
+                "currency" : stmt.excluded.currency,
+                "gross" : stmt.excluded.gross,
+            },
+        )
         await session.execute(stmt)
 
         stmt = insert(Employer).values(employer_values)
