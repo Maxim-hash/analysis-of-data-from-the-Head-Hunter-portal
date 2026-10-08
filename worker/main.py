@@ -2,12 +2,12 @@ import asyncio
 
 from app.core.session import AsyncSessionLocal
 from app.core.config import settings
-from worker.utils import init_areas_if_needed, parse_hh_data
+from worker.utils import refresh_areas, parse_hh_data
 
 
 async def run_worker():
     async with AsyncSessionLocal() as session:
-        await init_areas_if_needed(session)
+        await refresh_areas(session)
 
     while True:
         async with AsyncSessionLocal() as session:
