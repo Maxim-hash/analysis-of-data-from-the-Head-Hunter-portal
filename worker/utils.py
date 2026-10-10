@@ -53,7 +53,7 @@ async def update_state(session):
     rows = []
     today = datetime.today()
     if last_state is None:
-        last_state = today - timedelta(days=30)
+        current_start_date = today - timedelta(days=30)
     else:
         current_start_date = max(last_state, today - timedelta(days=30))
 
@@ -110,7 +110,8 @@ async def parse_hh_data(session):
 
         vacancy_values = [map_vacancy(i) for i in items]
         employer_values = [map_employer(i) for i in items]
-        salary_values = [map_salary(i) for i in items]
+        salary_values = [s for s in (map_salary(i) for i in items) if s["s_from"] is not None or s["s_to"] is not None]
+
 
         stmt = insert(Vacancy).values(vacancy_values)
         stmt = stmt.on_conflict_do_nothing(index_elements=[Vacancy.id])
@@ -189,6 +190,7 @@ def map_employer(item: dict) -> dict:
 
 def map_vacancy(item: dict) -> dict:
     _id = int(item["id"])
+    roles = item.get("professional_roles") or []
     logger.debug("raw item: %s", json.dumps(item, ensure_ascii=False))
     return {
         "id": _id,
@@ -198,8 +200,8 @@ def map_vacancy(item: dict) -> dict:
         "requirement": item["snippet"]["requirement"],
         "responsobility": item["snippet"]["responsibility"],
         "schedule": item.get("schedule", {}).get("id", "unknown"),
-        "prof_roles": item["professional_roles"][0]["name"],
-        "exp": item["experience"]["id"],
+        "prof_roles": (roles[0].get("name") if roles else None),
+        "exp": extract_id(item, "experience"),
         "empoyment": extract_id(item, "employment_form"),
         "employers_name": item["employer"]["name"],
     }
