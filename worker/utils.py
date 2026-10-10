@@ -1,4 +1,6 @@
 from datetime import datetime, timedelta
+import json
+import logging
 
 from dateutil.parser import isoparse
 from sqlalchemy import desc, func, select, update
@@ -12,6 +14,7 @@ from app.models.vacancy import Vacancy
 from app.models.hhParserState import HHParserState
 from app.core.hhClient import hhClient
 
+logger = logging.getLogger(__name__)
 
 async def get_state(session):
     result = await session.execute(
@@ -25,7 +28,6 @@ async def get_state(session):
             select(HHParserState).where(HHParserState.done == False).limit(1)
         )
         state = result.scalar()
-
     return state
 
 async def close_interval_states(session, state):
@@ -38,7 +40,7 @@ async def close_interval_states(session, state):
                 HHParserState.done == False,
             )
             .values(done=True)
-        )
+    )
     await session.execute(stmt)
     await session.commit()
 
@@ -88,9 +90,9 @@ async def refresh_areas(session):
 
 async def parse_hh_data(session):
     client = hhClient()
+    state = await get_state(session)
+    logger.info("parsing interval %s %s", state.date_from, state.date_to)
     while True:
-        state = await get_state(session)
-        print(state.id)
         data = client.fetch_vacancies({
             "page": state.page, 
             "per_page": state.per_page, 
@@ -101,6 +103,8 @@ async def parse_hh_data(session):
         pages = data.get("pages")
         if not items:
             state.done = True
+            logger.info("state date_from=%s date_to=%s have 0 entries on page %s, state closed",
+                        state.date_from, state.date_to, state.page)
             await session.commit()
             return
 
@@ -128,9 +132,15 @@ async def parse_hh_data(session):
         stmt = stmt.on_conflict_do_nothing(index_elements=[Employer.name])
         await session.execute(stmt)
 
+        logger.info("page %s done: vacancies=%s salaries=%s employers=%s",
+                            state.page, len(vacancy_values), len(salary_values), len(employer_values))
         state.page += 1
         if state.page >= pages:
             state.done = True
+            logger.info("state was closed date_from=%s date_to=%s after %s pages", 
+                        state.date_from, state.date_to, state.page)
+            await session.commit()
+            return
         await session.commit()
 
 def flatten_areas(areas_raw) -> list[dict]:
@@ -179,6 +189,7 @@ def map_employer(item: dict) -> dict:
 
 def map_vacancy(item: dict) -> dict:
     _id = int(item["id"])
+    logger.debug("raw item: %s", json.dumps(item, ensure_ascii=False))
     return {
         "id": _id,
         "name": item["name"],
@@ -189,6 +200,13 @@ def map_vacancy(item: dict) -> dict:
         "schedule": item.get("schedule", {}).get("id", "unknown"),
         "prof_roles": item["professional_roles"][0]["name"],
         "exp": item["experience"]["id"],
-        "empoyment": item["id"],
+        "empoyment": extract_id(item, "employment_form"),
         "employers_name": item["employer"]["name"],
     }
+
+def extract_id(item: dict, key: str) -> str | None:
+    """Достаёт item[key]["id"] безопасно; None, если поля нет."""
+    block = item.get(key)
+    if isinstance(block, dict):
+        return block.get("id")
+    return None

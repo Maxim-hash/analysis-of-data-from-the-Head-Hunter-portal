@@ -8,7 +8,7 @@
 {% if vacancies %}
     <ul>
     {% for vacancy in vacancies %}
-        <li>
+        <li class="vacancy_card">
             <h2>
                 <a href="{{ url_for('read_vacancy', vacancy_id=vacancy.id) }}">
                     {{ vacancy.name }}
